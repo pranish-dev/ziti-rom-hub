@@ -72,6 +72,29 @@ function readFileIfExists(filePath: string): string | null {
   return fs.readFileSync(filePath, "utf8");
 }
 
+/**
+ * Parse frontmatter, reporting YAML syntax errors as clean, file-anchored
+ * failures instead of an uncaught stack trace.
+ */
+function parseFrontmatter(
+  raw: string,
+  mdPath: string,
+  errors: string[]
+): { data: unknown; content: string } | null {
+  try {
+    return matter(raw);
+  } catch (error) {
+    const detail = String(error instanceof Error ? error.message : error)
+      .split("\n")
+      .map((line) => `  ${line}`)
+      .join("\n");
+    errors.push(
+      ["Unparseable YAML frontmatter:", "", mdPath, "", detail].join("\n")
+    );
+    return null;
+  }
+}
+
 /** Map a file inside content/ to its public URL under /media. */
 function mediaUrl(contentRelativePath: string): string {
   const segments = contentRelativePath.split("/").map(encodeURIComponent);
@@ -153,7 +176,9 @@ function loadRoms(errors: string[]): RomWithReleases[] {
       continue;
     }
 
-    const parsed = romSchema.safeParse(matter(raw).data);
+    const parsedFile = parseFrontmatter(raw, romMdRel, errors);
+    if (!parsedFile) continue;
+    const parsed = romSchema.safeParse(parsedFile.data);
     if (!parsed.success) {
       errors.push(formatContentError("ROM", romMdRel, parsed.error));
       continue;
@@ -232,16 +257,17 @@ function loadReleases(romSlug: string, errors: string[]): Release[] {
       continue;
     }
 
-    const { data, content } = matter(raw);
-    const parsed = releaseSchema.safeParse(data);
+    const parsedFile = parseFrontmatter(raw, relMdRel, errors);
+    if (!parsedFile) continue;
+    const parsed = releaseSchema.safeParse(parsedFile.data);
     if (!parsed.success) {
       errors.push(formatContentError("release", relMdRel, parsed.error));
       continue;
     }
 
     const frontmatter = parsed.data;
-    const bodyHtml = renderMarkdown(content);
-    const bodyExcerpt = stripMarkdown(content).slice(0, 600);
+    const bodyHtml = renderMarkdown(parsedFile.content);
+    const bodyExcerpt = stripMarkdown(parsedFile.content).slice(0, 600);
     const banner = findBanner(romSlug, versionDir, releaseDir);
 
     releases.push({
@@ -292,8 +318,9 @@ function loadGuides(errors: string[]): Guide[] {
     const raw = readFileIfExists(filePath);
     if (raw === null) continue;
 
-    const { data, content } = matter(raw);
-    const parsed = guideSchema.safeParse(data);
+    const parsedFile = parseFrontmatter(raw, mdPath, errors);
+    if (!parsedFile) continue;
+    const parsed = guideSchema.safeParse(parsedFile.data);
     if (!parsed.success) {
       errors.push(formatContentError("guide", mdPath, parsed.error));
       continue;
@@ -304,7 +331,7 @@ function loadGuides(errors: string[]): Guide[] {
       title: parsed.data.title,
       description: parsed.data.description,
       order: parsed.data.order,
-      bodyHtml: renderMarkdown(content),
+      bodyHtml: renderMarkdown(parsedFile.content),
     });
   }
 

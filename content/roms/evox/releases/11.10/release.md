@@ -8,7 +8,7 @@ build_type:
   - Vanilla
 maintainer: "loid_ok"
 downloads:
-  primary: "https://sourceforge.net/projects/evox-unofficial-ziti/files/Release//"
+  primary: "https://sourceforge.net/projects/evox-unofficial-ziti/files/Release/"
   mirror: 
   changelog: "https://raw.githubusercontent.com/anchalsehrawat/Evox_OTA/refs/heads/bka/changelogs/ziti.txt"
 requirements:
@@ -32,7 +32,7 @@ credits:
 ---
 
 ## Highlights
-
+- [Recovery](https://sourceforge.net/projects/evox-unofficial-ziti/files/Recovery/evox_ziti_recovery-unofficial-withPTools-20260321.zip/download)
 - KernelSU Next updated to **v3.3.0**, paired with **SusFS v2.1.0**.
 
 ## Installation notes
