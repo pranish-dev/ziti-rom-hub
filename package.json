@@ -12,6 +12,7 @@
     "generate-sample-media": "bash scripts/generate-sample-media.sh"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "gray-matter": "^4.0.3",
     "marked": "^16.2.1",
     "next": "^15.5.4",
