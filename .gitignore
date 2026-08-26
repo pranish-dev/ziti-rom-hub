@@ -1,0 +1,27 @@
+# dependencies
+/node_modules
+
+# next.js
+/.next
+/out
+next-env.d.ts
+
+# generated at build/dev time from content/ — do not commit
+/public/media
+
+# misc
+.DS_Store
+*.tsbuildinfo
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# env
+.env*.local
+
+# vercel / editors
+.vercel
+.idea
+.vscode
