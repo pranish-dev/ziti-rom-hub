@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Archivo, IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { NavigationProgress } from "@/components/navigation-progress";
@@ -85,6 +86,7 @@ export default function RootLayout({
         </main>
         <SiteFooter />
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
