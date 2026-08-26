@@ -1,0 +1,8 @@
+#!/bin/sh
+# Runs before every `git commit` — blocks commits with invalid content.
+echo "Validating content..."
+if ! npm run --silent validate-content; then
+  echo ""
+  echo "Commit blocked: fix the content errors above, then try again."
+  exit 1
+fi
