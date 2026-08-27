@@ -4,9 +4,20 @@ import { ReleaseRow, RomRow } from "@/components/release-row";
 import { SectionHead } from "@/components/section-head";
 import { getAllGuides, getAllRoms, getHubStats, getRecentReleases } from "@/lib/content";
 import { toReleaseListItem } from "@/lib/format";
+import { site } from "@/lib/site";
+import { buildOpenGraph, buildTwitter } from "@/lib/seo";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
+  openGraph: buildOpenGraph({
+    title: `${site.name} — Custom ROMs for the ${site.device}`,
+    description: site.tagline,
+    path: "/",
+  }),
+  twitter: buildTwitter({
+    title: `${site.name} — Custom ROMs for the ${site.device}`,
+    description: site.tagline,
+  }),
 };
 
 export default function HomePage() {

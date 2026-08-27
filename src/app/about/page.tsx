@@ -2,12 +2,24 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { site } from "@/lib/site";
+import { buildOpenGraph, buildTwitter } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "About",
   description:
     "What Ziti ROM Hub is, device specifications, and how to get help with the OnePlus Nord CE 3 5G (ziti).",
   alternates: { canonical: "/about" },
+  openGraph: buildOpenGraph({
+    title: "About",
+    description:
+      "What Ziti ROM Hub is, device specifications, and how to get help with the OnePlus Nord CE 3 5G (ziti).",
+    path: "/about",
+  }),
+  twitter: buildTwitter({
+    title: "About",
+    description:
+      "What Ziti ROM Hub is, device specifications, and how to get help with the OnePlus Nord CE 3 5G (ziti).",
+  }),
 };
 
 export default function AboutPage() {

@@ -9,6 +9,7 @@ import {
   formatReleaseDate,
   releaseHref,
 } from "@/lib/format";
+import { buildOpenGraph, buildTwitter } from "@/lib/seo";
 
 export const dynamicParams = false;
 
@@ -24,14 +25,28 @@ export async function generateMetadata({
   const { slug } = await params;
   const rom = getRom(slug);
   if (!rom) return {};
+  const title = `${rom.name} for the ${rom.device} (${rom.codename})`;
+  const description = rom.description.slice(0, 155);
+  // Prefer the latest release banner as the share image; fall back to og.png.
+  const image = rom.latest?.banner
+    ? {
+        url: rom.latest.banner,
+        width: rom.latest.bannerWidth,
+        height: rom.latest.bannerHeight,
+        alt: `${rom.name} ${rom.latest.version} banner`,
+      }
+    : null;
   return {
-    title: `${rom.name} for the ${rom.device} (${rom.codename})`,
-    description: rom.description.slice(0, 155),
+    title,
+    description,
     alternates: { canonical: `/ziti/roms/${rom.slug}` },
-    openGraph: {
-      title: `${rom.name} for the ${rom.device} (${rom.codename})`,
-      description: rom.description.slice(0, 155),
-    },
+    openGraph: buildOpenGraph({
+      title,
+      description,
+      path: `/ziti/roms/${rom.slug}`,
+      image,
+    }),
+    twitter: buildTwitter({ title, description, image }),
   };
 }
 

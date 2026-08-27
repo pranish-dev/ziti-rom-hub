@@ -3,12 +3,24 @@ import { ReleasesExplorer } from "@/components/releases-explorer";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { getAllReleases } from "@/lib/content";
 import { toReleaseListItem } from "@/lib/format";
+import { buildOpenGraph, buildTwitter } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "All Releases",
   description:
     "Every release across every ROM for the OnePlus Nord CE 3 5G (ziti), newest first. Filter by ROM, Android version or build type.",
   alternates: { canonical: "/releases" },
+  openGraph: buildOpenGraph({
+    title: "All Releases",
+    description:
+      "Every release across every ROM for the OnePlus Nord CE 3 5G (ziti), newest first. Filter by ROM, Android version or build type.",
+    path: "/releases",
+  }),
+  twitter: buildTwitter({
+    title: "All Releases",
+    description:
+      "Every release across every ROM for the OnePlus Nord CE 3 5G (ziti), newest first.",
+  }),
 };
 
 export default function ReleasesPage() {

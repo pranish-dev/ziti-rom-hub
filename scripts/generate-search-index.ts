@@ -1,12 +1,19 @@
-import { getAllGuides, getAllRoms, getAllReleases } from "@/lib/content";
-import { formatReleaseDate, releaseHref, romHref } from "@/lib/format";
-
 /**
- * Build-time search index served as static JSON.
- * Covers ROM names, release versions, Android bases, codenames,
- * maintainers, build types and guide content.
+ * Generates the client-side search index as a static JSON file.
+ *
+ * Replaces the former /api/search route: with `output: "export"` a route
+ * file is emitted without an extension, which Cloudflare Pages would serve
+ * with the wrong content type. Writing public/search-index.json instead
+ * guarantees correct headers on any static host.
+ *
+ * Run directly:  npm run generate-search-index
+ * (also runs automatically before `npm run build`)
  */
-export const dynamic = "force-static";
+import { writeFile } from "node:fs/promises";
+import path from "node:path";
+
+import { getAllGuides, getAllRoms, getAllReleases } from "../src/lib/content";
+import { formatReleaseDate, releaseHref, romHref } from "../src/lib/format";
 
 interface SearchEntry {
   kind: "ROM" | "Release" | "Guide";
@@ -24,7 +31,7 @@ function toTerms(parts: Array<string | undefined>): string {
     .replace(/\s+/g, " ");
 }
 
-export function GET(): Response {
+async function main() {
   const entries: SearchEntry[] = [];
 
   for (const rom of getAllRoms()) {
@@ -75,5 +82,14 @@ export function GET(): Response {
     });
   }
 
-  return Response.json(entries);
+  const destination = path.join(process.cwd(), "public", "search-index.json");
+  await writeFile(destination, JSON.stringify(entries), "utf8");
+  console.log(
+    `[search-index] ${entries.length} entries written to public/search-index.json`
+  );
 }
+
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

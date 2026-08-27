@@ -9,8 +9,8 @@ export const site = {
   codename: "ziti",
   tagline:
     "Custom ROMs, releases and flashing guides for the OnePlus Nord CE 3 5G.",
-  /** Set NEXT_PUBLIC_SITE_URL in Vercel to the production domain. */
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://ziti-rom-hub.vercel.app",
+  /** Set NEXT_PUBLIC_SITE_URL in Cloudflare Pages to the production domain. */
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://ziti-rom-hub.pages.dev",
   githubRepo: "https://github.com/pranish-dev/ziti-rom-hub",
   author: "ziti community",
 } as const;

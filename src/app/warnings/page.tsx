@@ -1,12 +1,24 @@
 import type { Metadata } from "next";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { SectionHead } from "@/components/section-head";
+import { buildOpenGraph, buildTwitter } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Warnings — Read Before Flashing",
   description:
     "Mandatory warnings and flashing steps for the OnePlus Nord CE 3 5G (ziti): OOS 15.0.0.1301/1601 rules, hard-brick risks, and how to flash custom ROMs safely.",
   alternates: { canonical: "/warnings" },
+  openGraph: buildOpenGraph({
+    title: "Warnings — Read Before Flashing",
+    description:
+      "Mandatory warnings and flashing steps for the OnePlus Nord CE 3 5G (ziti): OOS 15.0.0.1301/1601 rules, hard-brick risks, and how to flash custom ROMs safely.",
+    path: "/warnings",
+  }),
+  twitter: buildTwitter({
+    title: "Warnings — Read Before Flashing",
+    description:
+      "OOS 15.0.0.1301/1601 rules, hard-brick risks and safe flashing steps for the OnePlus Nord CE 3 5G (ziti).",
+  }),
 };
 
 const REQUIREMENTS = [

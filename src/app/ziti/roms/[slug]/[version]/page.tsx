@@ -14,6 +14,7 @@ import {
   releaseHref,
   romHref,
 } from "@/lib/format";
+import { buildOpenGraph, buildTwitter } from "@/lib/seo";
 
 export const dynamicParams = false;
 
@@ -33,16 +34,30 @@ export async function generateMetadata({
   const release = getRelease(slug, version);
   if (!release) return {};
   const title = `${release.rom.name} ${release.version} for the ${release.rom.device} (${release.rom.codename})`;
+  const description =
+    release.bodyExcerpt.slice(0, 155) ||
+    `${release.version} of ${release.rom.name} for the ${release.rom.device}, based on ${release.android}.`;
+  const image = release.banner
+    ? {
+        url: release.banner,
+        width: release.bannerWidth,
+        height: release.bannerHeight,
+        alt: `${release.rom.name} ${release.version} banner`,
+      }
+    : null;
   return {
     title,
-    description:
-      release.bodyExcerpt.slice(0, 155) ||
-      `${release.version} of ${release.rom.name} for the ${release.rom.device}, based on ${release.android}.`,
+    description,
     alternates: { canonical: releaseHref(slug, version) },
-    openGraph: {
+    openGraph: buildOpenGraph({
       title,
-      images: release.banner ? [{ url: release.banner }] : undefined,
-    },
+      description,
+      path: releaseHref(slug, version),
+      type: "article",
+      image,
+      publishedTime: release.releaseDate,
+    }),
+    twitter: buildTwitter({ title, description, image }),
   };
 }
 

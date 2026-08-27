@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+import Script from "next/script";
 import { Archivo, IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { NavigationProgress } from "@/components/navigation-progress";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { site } from "@/lib/site";
+import { buildOpenGraph, buildTwitter } from "@/lib/seo";
 
 const archivo = Archivo({
   subsets: ["latin"],
@@ -45,17 +45,15 @@ export const metadata: Metadata = {
     "flashing guide",
     "OOS 15.0.0.1301",
   ],
-  openGraph: {
-    type: "website",
-    siteName: site.name,
+  openGraph: buildOpenGraph({
     title: `${site.name} — Custom ROMs for the ${site.device}`,
     description: site.tagline,
-    images: ["/og.png"],
-    locale: "en_US",
-  },
-  twitter: {
-    card: "summary_large_image",
-  },
+    path: "/",
+  }),
+  twitter: buildTwitter({
+    title: `${site.name} — Custom ROMs for the ${site.device}`,
+    description: site.tagline,
+  }),
 };
 
 export const viewport: Viewport = {
@@ -85,8 +83,14 @@ export default function RootLayout({
           {children}
         </main>
         <SiteFooter />
-        <Analytics />
-        <SpeedInsights />
+        {process.env.NEXT_PUBLIC_CF_BEACON_TOKEN ? (
+          <Script
+            defer
+            strategy="afterInteractive"
+            src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon={`{"token": "${process.env.NEXT_PUBLIC_CF_BEACON_TOKEN}"}`}
+          />
+        ) : null}
       </body>
     </html>
   );

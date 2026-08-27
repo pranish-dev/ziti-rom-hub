@@ -44,7 +44,7 @@ export function SearchClient() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/search")
+    fetch("/search-index.json")
       .then((response) => {
         if (!response.ok) throw new Error(String(response.status));
         return response.json() as Promise<SearchEntry[]>;

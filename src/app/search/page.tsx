@@ -1,12 +1,24 @@
 import type { Metadata } from "next";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { SearchClient } from "@/components/search-client";
+import { buildOpenGraph, buildTwitter } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Search",
   description:
     "Search ROMs, releases and guides for the OnePlus Nord CE 3 5G (ziti).",
   alternates: { canonical: "/search" },
+  openGraph: buildOpenGraph({
+    title: "Search",
+    description:
+      "Search ROMs, releases and guides for the OnePlus Nord CE 3 5G (ziti).",
+    path: "/search",
+  }),
+  twitter: buildTwitter({
+    title: "Search",
+    description:
+      "Search ROMs, releases and guides for the OnePlus Nord CE 3 5G (ziti).",
+  }),
 };
 
 export default function SearchPage() {

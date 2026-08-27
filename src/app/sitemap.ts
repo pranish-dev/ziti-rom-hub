@@ -3,6 +3,9 @@ import { getAllGuides, getAllRoms, getAllReleases } from "@/lib/content";
 import { releaseHref, romHref } from "@/lib/format";
 import { site } from "@/lib/site";
 
+// Required for `output: "export"` — emits a static sitemap.xml at build time.
+export const dynamic = "force-static";
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   const staticRoutes: MetadataRoute.Sitemap = [

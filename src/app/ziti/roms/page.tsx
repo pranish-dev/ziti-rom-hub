@@ -3,12 +3,24 @@ import Link from "next/link";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { getAllRoms } from "@/lib/content";
 import { formatReleaseDate } from "@/lib/format";
+import { buildOpenGraph, buildTwitter } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Custom ROMs",
   description:
     "Every custom ROM maintained for the OnePlus Nord CE 3 5G (ziti) — Android bases, maintainers and latest builds.",
   alternates: { canonical: "/ziti/roms" },
+  openGraph: buildOpenGraph({
+    title: "Custom ROMs",
+    description:
+      "Every custom ROM maintained for the OnePlus Nord CE 3 5G (ziti) — Android bases, maintainers and latest builds.",
+    path: "/ziti/roms",
+  }),
+  twitter: buildTwitter({
+    title: "Custom ROMs",
+    description:
+      "Every custom ROM maintained for the OnePlus Nord CE 3 5G (ziti) — Android bases, maintainers and latest builds.",
+  }),
 };
 
 export default function RomsIndexPage() {

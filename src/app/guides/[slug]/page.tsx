@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { MarkdownBody } from "@/components/markdown-body";
 import { getAllGuides, getGuide } from "@/lib/content";
+import { buildOpenGraph, buildTwitter } from "@/lib/seo";
 
 export const dynamicParams = false;
 
@@ -19,13 +20,20 @@ export async function generateMetadata({
   const { slug } = await params;
   const guide = getGuide(slug);
   if (!guide) return {};
+  const description =
+    guide.description ??
+    `Guide: ${guide.title} — OnePlus Nord CE 3 5G (ziti).`;
   return {
     title: guide.title,
-    description:
-      guide.description ??
-      `Guide: ${guide.title} — OnePlus Nord CE 3 5G (ziti).`,
+    description,
     alternates: { canonical: `/guides/${guide.slug}` },
-    openGraph: { title: guide.title },
+    openGraph: buildOpenGraph({
+      title: guide.title,
+      description,
+      path: `/guides/${guide.slug}`,
+      type: "article",
+    }),
+    twitter: buildTwitter({ title: guide.title, description }),
   };
 }
 

@@ -2,12 +2,24 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { getAllGuides } from "@/lib/content";
+import { buildOpenGraph, buildTwitter } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Guides",
   description:
     "Flashing and modding guides for the OnePlus Nord CE 3 5G (ziti): bootloader, custom ROM flashing, reverting to stock and common fixes.",
   alternates: { canonical: "/guides" },
+  openGraph: buildOpenGraph({
+    title: "Guides",
+    description:
+      "Flashing and modding guides for the OnePlus Nord CE 3 5G (ziti): bootloader, custom ROM flashing, reverting to stock and common fixes.",
+    path: "/guides",
+  }),
+  twitter: buildTwitter({
+    title: "Guides",
+    description:
+      "Flashing and modding guides for the OnePlus Nord CE 3 5G (ziti).",
+  }),
 };
 
 export default function GuidesIndexPage() {
