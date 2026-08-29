@@ -2,6 +2,7 @@
 name: VoltageOS
 slug: voltageos
 maintainer: okkotsu
+maintainer_telegram: "https://t.me/okkotsu66"
 android_base: Android 16
 support: "official"
 official_site: https://www.voltageos.com/

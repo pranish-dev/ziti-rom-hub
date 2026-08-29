@@ -8,12 +8,13 @@ build_type:
   - GMS
   - Vanilla
 maintainer: "okkotsu"
+maintainer_telegram: "https://t.me/okkotsu66"
 downloads:
   primary: "https://sourceforge.net/projects/ghosuto/files/ziti/"
   mirror: "https://gofile.io/d/DOGSp2Rn"
   changelog: "https://raw.githubusercontent.com/Lunaris-AOSP/OTA/refs/heads/16.2/changelogs/ziti.txt"
 requirements:
-  arb: "Do not downgrade firmware below the level required by this build. Read the warnings first."
+  arb: "Installing Custom rom for first time ? Read warnings before proceeding"
 warnings:
   - "Users on stock 1301+ builds must follow the migration notes before flashing."
   - "Clean flash is mandatory when coming from OxygenOS or another ROM."

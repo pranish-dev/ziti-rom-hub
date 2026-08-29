@@ -2,6 +2,7 @@
 name: LineageOS
 slug: lineageos
 maintainer: pjgowtham
+maintainer_telegram: "https://t.me/pjgowtham"
 android_base: Android 16
 support: "unofficial"
 official_site: https://lineageos.org/

@@ -2,6 +2,7 @@
 name: AxionOS
 slug: axionos
 maintainer: arka
+maintainer_telegram: "https://t.me/Desplicableguy"
 android_base: Android 16
 support: "unofficial"
 official_site: https://www.axionos.org

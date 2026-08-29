@@ -7,13 +7,14 @@ build_type:
   - GMS
   - Vanilla
 maintainer: "loid_ok"
+maintainer_telegram: "https://t.me/loid_ok"
 downloads:
   primary: "https://sourceforge.net/projects/evox-unofficial-ziti/files/Release/"
   mirror: 
   changelog: "https://raw.githubusercontent.com/anchalsehrawat/Evox_OTA/refs/heads/bka/changelogs/ziti.txt"
   recovery: "https://sourceforge.net/projects/evox-unofficial-ziti/files/Recovery/evox_ziti_recovery-unofficial-withPTools-20260321.zip/download"
 requirements:
-  arb: "Do not downgrade firmware below the level required by this build. Read the warnings first."
+  arb: "Installing Custom rom for first time ? Read warnings before proceeding"
 warnings:
   - "Users on stock 1301+ builds must follow the migration notes before flashing."
   - "Clean flash is mandatory when coming from OxygenOS or another ROM."

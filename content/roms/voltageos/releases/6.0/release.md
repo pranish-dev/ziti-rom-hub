@@ -6,12 +6,13 @@ qpr: "QPR2"
 build_type:
   - Vanilla
 maintainer: "okkotsu"
+maintainer_telegram: "https://t.me/okkotsu66"
 downloads:
   primary: "https://sourceforge.net/projects/ziti-voltageos-unofficial/files/"
   mirror: "https://gofile.io/d/pPZHM9bU"
   changelog: "hhttps://raw.githubusercontent.com/ziti-resources/android_vendor_voltageota/refs/heads/16.2/changelog_ziti.txt"
 requirements:
-  arb: "Do not downgrade firmware below the level required by this build. Read the warnings first."
+  arb: "Installing Custom rom for first time ? Read warnings before proceeding"
 warnings:
   - "Users on stock 1301+ builds must follow the migration notes before flashing."
   - "Clean flash is mandatory when coming from OxygenOS or another ROM."

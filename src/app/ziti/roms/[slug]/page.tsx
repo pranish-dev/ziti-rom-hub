@@ -167,7 +167,20 @@ export default async function RomPage({
         <aside className="space-y-10 lg:border-l lg:border-line lg:pl-10">
           <section aria-label="ROM information">
             <MetaList>
-              <MetaRow label="Maintainer">{rom.maintainer}</MetaRow>
+              <MetaRow label="Maintainer">
+                {rom.maintainerTelegram ? (
+                  <a
+                    href={rom.maintainerTelegram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline decoration-line underline-offset-2 transition-colors hover:text-accent hover:decoration-accent"
+                  >
+                    {rom.maintainer}
+                  </a>
+                ) : (
+                  rom.maintainer
+                )}
+              </MetaRow>
               <MetaRow label="Android base">{rom.androidBase}</MetaRow>
               <MetaRow label="Support">
                 <span

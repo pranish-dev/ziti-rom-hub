@@ -77,6 +77,7 @@ export const romSchema = z
     maintainer: field(
       z.string({ required_error: "is required" }).min(1, "cannot be empty")
     ),
+    maintainer_telegram: field(urlField.optional()),
     android_base: field(
       z.string({ required_error: "is required" }).min(1, "cannot be empty")
     ),
@@ -135,6 +136,7 @@ export const releaseSchema = z
     ).default("normal"),
     build_type: field(z.array(field(z.string().min(1))).default([])),
     maintainer: field(z.string().min(1).optional()),
+    maintainer_telegram: field(urlField.optional()),
     downloads: field(downloadsSchema.default({})),
     requirements: field(requirementsSchema.default({})),
     warnings: field(z.array(field(z.string().min(1))).default([])),

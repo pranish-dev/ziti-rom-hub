@@ -58,7 +58,19 @@ export default function RomsIndexPage() {
                   ) : (
                     <span>Unofficial</span>
                   )}{" "}
-                  · {rom.androidBase} · Maintainer {rom.maintainer}
+                  · {rom.androidBase} · Maintainer{" "}
+                  {rom.maintainerTelegram ? (
+                    <a
+                      href={rom.maintainerTelegram}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline decoration-line underline-offset-2 transition-colors hover:text-accent hover:decoration-accent"
+                    >
+                      {rom.maintainer}
+                    </a>
+                  ) : (
+                    rom.maintainer
+                  )}
                 </span>
               </span>
               <span className="max-w-xl self-center text-[13px] leading-relaxed text-muted line-clamp-2">

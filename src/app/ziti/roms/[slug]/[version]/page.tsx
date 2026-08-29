@@ -99,6 +99,7 @@ export default async function ReleasePage({
   const facts: Array<{
     label: string;
     value: string;
+    href?: string;
     wide?: boolean;
     accent?: boolean;
   }> = [
@@ -116,6 +117,7 @@ export default async function ReleasePage({
     {
       label: "Maintainer",
       value: release.maintainer ?? rom.maintainer,
+      href: release.maintainerTelegram,
       wide: true,
     },
   ];
@@ -184,7 +186,18 @@ export default async function ReleasePage({
                 fact.accent ? "font-semibold text-accent" : "text-fg"
               } ${fact.wide ? "" : "font-mono"}`}
             >
-              {fact.value}
+              {fact.href ? (
+                <a
+                  href={fact.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline decoration-line underline-offset-2 transition-colors hover:text-accent hover:decoration-accent"
+                >
+                  {fact.value}
+                </a>
+              ) : (
+                fact.value
+              )}
             </dd>
           </div>
         ))}
@@ -374,7 +387,18 @@ export default async function ReleasePage({
                 </MetaRow>
               )}
               <MetaRow label="Maintainer">
-                {release.maintainer ?? rom.maintainer}
+                {release.maintainerTelegram ? (
+                  <a
+                    href={release.maintainerTelegram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline decoration-line underline-offset-2 transition-colors hover:text-accent hover:decoration-accent"
+                  >
+                    {release.maintainer ?? rom.maintainer}
+                  </a>
+                ) : (
+                  release.maintainer ?? rom.maintainer
+                )}
               </MetaRow>
               <MetaRow label="Clean flash">
                 <span className={release.cleanFlash ? "text-accent" : ""}>

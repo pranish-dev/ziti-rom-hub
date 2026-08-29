@@ -6,13 +6,14 @@ qpr: "QPR2"
 build_type:
   - GMS
 maintainer: Arka
+maintainer_telegram: "https://t.me/Desplicableguy"
 downloads:
   primary: 
   mirror: "https://gofile.io/d/t2Ep5n5E"
   recovery: "https://gofile.io/d/XFdCw66r"
   changelog: 
 requirements:
-  arb: "Do not downgrade firmware below the level required by this build. Read the warnings first."
+  arb: "Installing Custom rom for first time ? Read warnings before proceeding"
 warnings:
   - "Users on stock 1301+ builds must follow the migration notes before flashing."
   - "Clean flash is mandatory when coming from OxygenOS or another ROM."

@@ -2,6 +2,7 @@
 name: EvolutionX
 slug: evox
 maintainer: loid_ok
+maintainer_telegram: "https://t.me/loid_ok"
 android_base: Android 16
 support: "unofficial"
 official_site: https://evolution-x.org/

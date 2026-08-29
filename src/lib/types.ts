@@ -20,6 +20,8 @@ export interface Rom {
   /** Marketing device name, defaults to "OnePlus Nord CE 3 5G". */
   device: string;
   maintainer: string;
+  /** Optional Telegram profile URL the maintainer name links to. */
+  maintainerTelegram?: string;
   androidBase: string;
   /** Whether the ROM officially supports the device, or is a community/unofficial build. */
   support: "official" | "unofficial";
@@ -57,6 +59,8 @@ export interface Release {
   build: "normal" | "hotfix";
   buildType: string[];
   maintainer?: string;
+  /** Optional Telegram profile URL the maintainer name links to. */
+  maintainerTelegram?: string;
   downloads: Downloads;
   requirements: Requirements;
   warnings: string[];

@@ -6,13 +6,14 @@ qpr: "QPR1"
 build_type:
   - Vanilla
 maintainer: "pjgowtham"
+maintainer_telegram: "https://t.me/pjgowtham"
 downloads:
   primary: "https://github.com/pjgowtham/android_device_oneplus_ziti/releases/download/lineage-23.2-20260624-UNOFFICIAL-ziti/lineage-23.2-20260624-UNOFFICIAL-ziti.zip/"
   mirror: 
   changelog: 
   recovery: "https://github.com/pjgowtham/android_device_oneplus_ziti/releases/tag/lineage-23.2-20260624-UNOFFICIAL-ziti"
 requirements:
-  arb: "Do not downgrade firmware below the level required by this build. Read the warnings first."
+  arb: "Installing Custom rom for first time ? Read warnings before proceeding"
 warnings:
   - "Users on stock 1301+ builds must follow the migration notes before flashing."
   - "Clean flash is mandatory when coming from OxygenOS or another ROM."
