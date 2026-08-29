@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { MetaList, MetaRow, SectionHead } from "@/components/section-head";
@@ -7,9 +8,11 @@ import { getAllRoms, getRom } from "@/lib/content";
 import {
   downloadHostLabel,
   formatReleaseDate,
+  isNewRelease,
   releaseHref,
 } from "@/lib/format";
 import { buildOpenGraph, buildTwitter } from "@/lib/seo";
+import type { Release } from "@/lib/types";
 
 export const dynamicParams = false;
 
@@ -26,7 +29,12 @@ export async function generateMetadata({
   const rom = getRom(slug);
   if (!rom) return {};
   const title = `${rom.name} for the ${rom.device} (${rom.codename})`;
-  const description = rom.description.slice(0, 155);
+  const description = [
+    `${rom.name} releases and downloads for the ${rom.device} (${rom.codename}).`,
+    rom.latest
+      ? `Latest: ${rom.latest.version} · ${rom.androidBase}.`
+      : `Based on ${rom.androidBase}.`,
+  ].join(" ");
   // Prefer the latest release banner as the share image; fall back to og.png.
   const image = rom.latest?.banner
     ? {
@@ -74,6 +82,17 @@ function ExternalLinkRow({
   );
 }
 
+/** Compact "Android · QPR · Variants" line for a release. */
+function releaseMeta(release: Release): string {
+  return [
+    release.android,
+    release.qpr,
+    release.buildType.length > 0 ? release.buildType.join(" / ") : null,
+  ]
+    .filter(Boolean)
+    .join(" • ");
+}
+
 export default async function RomPage({
   params,
 }: {
@@ -82,6 +101,43 @@ export default async function RomPage({
   const { slug } = await params;
   const rom = getRom(slug);
   if (!rom) notFound();
+
+  // `rom.latest` and `rom.releases` come pre-sorted (newest first) from the
+  // content loader — this page never re-derives ordering or counts.
+  const latest = rom.latest;
+  const downloadUrl = latest?.downloads.primary ?? latest?.downloads.mirror;
+
+  const facts: Array<{
+    label: string;
+    value: string;
+    href?: string;
+    external?: boolean;
+    accent?: boolean;
+  }> = [
+    { label: "Android", value: rom.androidBase },
+    {
+      label: "Status",
+      value: rom.support === "official" ? "Official" : "Unofficial",
+      accent: rom.support === "official",
+    },
+    {
+      label: "Maintainer",
+      value: rom.maintainer,
+      href: rom.maintainerTelegram,
+      external: true,
+    },
+    {
+      label: "Latest",
+      value: latest ? latest.version : "—",
+      href: latest ? releaseHref(latest.romSlug, latest.versionDir) : undefined,
+    },
+  ];
+  const factCols =
+    facts.length >= 6
+      ? "lg:grid-cols-6"
+      : facts.length === 5
+        ? "lg:grid-cols-5"
+        : "lg:grid-cols-4";
 
   return (
     <div className="container-page pb-16 pt-10 sm:pt-12">
@@ -100,8 +156,40 @@ export default async function RomPage({
         </h1>
         <p className="mt-2 flex flex-wrap items-center gap-x-2 text-[14px] text-muted">
           For the {rom.device}
-          <span className="chip">ziti</span>
+          <span className="chip">{rom.codename}</span>
         </p>
+
+        {/* Compact facts strip — Android version, status, maintainer, latest. */}
+        <dl
+          className={`mt-8 grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 ${factCols}`}
+        >
+          {facts.map((fact) => (
+            <div key={fact.label} className="bg-background px-3.5 py-3">
+              <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-faint">
+                {fact.label}
+              </dt>
+              <dd
+                className={`mt-1 text-[13.5px] leading-snug ${
+                  fact.accent ? "font-semibold text-accent" : "text-fg"
+                } ${fact.href ? "" : "font-mono"}`}
+              >
+                {fact.href ? (
+                  <a
+                    href={fact.href}
+                    {...(fact.external
+                      ? { target: "_blank", rel: "noopener noreferrer" }
+                      : {})}
+                    className="underline decoration-line underline-offset-2 transition-colors hover:text-accent hover:decoration-accent"
+                  >
+                    {fact.value}
+                  </a>
+                ) : (
+                  fact.value
+                )}
+              </dd>
+            </div>
+          ))}
+        </dl>
       </header>
 
       <div className="mt-10 grid gap-12 lg:grid-cols-[minmax(0,1fr)_290px] lg:gap-16">
@@ -120,6 +208,50 @@ export default async function RomPage({
             </div>
           </section>
 
+          {latest && (
+            <section aria-label="Latest release">
+              <SectionHead label="Latest release" />
+              <div className="panel">
+                <div className="flex flex-col gap-4 px-5 py-4 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                      <span className="font-mono text-xl font-semibold text-fg">
+                        {latest.version}
+                      </span>
+                      <span className="badge-new">Latest</span>
+                    </p>
+                    <p className="mt-1.5 truncate text-[13px] text-muted">
+                      {releaseMeta(latest)}
+                    </p>
+                  </div>
+                  <div className="sm:text-right">
+                    <time
+                      dateTime={latest.releaseDate}
+                      className="font-mono text-[11px] uppercase tracking-[0.14em] text-faint"
+                    >
+                      {formatReleaseDate(latest.releaseDate)}
+                    </time>
+                    <div className="mt-2.5">
+                      <Link
+                        href={releaseHref(latest.romSlug, latest.versionDir)}
+                        className="btn-outline-accent"
+                      >
+                        View release <span aria-hidden="true">→</span>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+                {downloadUrl && (
+                  <p className="border-t border-line px-5 py-3 text-[12.5px] leading-relaxed text-faint">
+                    The newest build is hosted on {downloadHostLabel(downloadUrl)}.
+                    See the release page for downloads, requirements and
+                    warnings.
+                  </p>
+                )}
+              </div>
+            </section>
+          )}
+
           <section aria-labelledby="releases-heading">
             <SectionHead
               label={`Releases (${rom.releaseCount})`}
@@ -127,37 +259,53 @@ export default async function RomPage({
               linkLabel="All releases"
             />
             {rom.releases.length === 0 ? (
-              <p className="py-8 text-[14px] text-faint">
-                No releases have been published for this ROM yet.
+              <p className="border-b border-line py-10 text-center font-mono text-[11px] uppercase tracking-[0.18em] text-faint">
+                No releases available yet.
               </p>
             ) : (
               <ul>
-                {rom.releases.map((release) => (
-                  <li key={release.versionDir}>
-                    <a
-                      href={releaseHref(release.romSlug, release.versionDir)}
-                      className="group -mx-2 grid gap-1 border-b border-line px-2 py-4 transition-colors last:border-b-0 hover:bg-surface sm:-mx-3 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:items-center sm:gap-6 sm:px-3"
-                    >
-                      <span className="font-mono text-[17px] font-semibold text-fg transition-colors group-hover:text-accent">
-                        {release.version}
-                      </span>
-                      <span className="min-w-0">
-                        <time
-                          dateTime={release.releaseDate}
-                          className="block font-mono text-[11px] uppercase tracking-[0.14em] text-faint"
+                {rom.releases.map((release, index) => {
+                  // The loader sorts releases newest first, so index 0 is latest.
+                  const isLatest = index === 0;
+                  const isNew = !isLatest && isNewRelease(release.releaseDate);
+                  return (
+                    <li key={release.versionDir}>
+                      <Link
+                        href={releaseHref(release.romSlug, release.versionDir)}
+                        className="group -mx-2 flex items-center gap-4 border-b border-line px-2 py-4 transition-colors last:border-b-0 hover:bg-surface sm:-mx-3 sm:px-3"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                            <span className="font-mono text-[16px] font-semibold text-fg transition-colors group-hover:text-accent">
+                              {release.version}
+                            </span>
+                            {isLatest && <span className="badge-new">Latest</span>}
+                            {isNew && (
+                              <span className="inline-flex items-center border border-line bg-raised px-1.5 py-px font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
+                                New
+                              </span>
+                            )}
+                          </span>
+                          <p className="mt-1 truncate text-[13px] text-muted">
+                            {releaseMeta(release)}
+                          </p>
+                          <time
+                            dateTime={release.releaseDate}
+                            className="mt-0.5 block font-mono text-[11px] uppercase tracking-[0.14em] text-faint"
+                          >
+                            {formatReleaseDate(release.releaseDate)}
+                          </time>
+                        </div>
+                        <span
+                          aria-hidden="true"
+                          className="shrink-0 font-mono text-[11px] uppercase tracking-[0.16em] text-faint transition-colors group-hover:text-accent"
                         >
-                          {formatReleaseDate(release.releaseDate)}
-                        </time>
-                        <span className="mt-0.5 block truncate text-[13px] text-muted">
-                          {[release.android, release.qpr].filter(Boolean).join(" • ")}
+                          View →
                         </span>
-                      </span>
-                      <span className="hidden shrink-0 items-center font-mono text-[11px] uppercase tracking-[0.16em] text-faint transition-colors group-hover:text-accent sm:flex">
-                        View release →
-                      </span>
-                    </a>
-                  </li>
-                ))}
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </section>
@@ -195,21 +343,6 @@ export default async function RomPage({
               </MetaRow>
               <MetaRow label="Codename">
                 <span className="font-mono text-[12px]">{rom.codename}</span>
-              </MetaRow>
-              <MetaRow label="Latest">
-                {rom.latest ? (
-                  <a
-                    href={releaseHref(
-                      rom.latest.romSlug,
-                      rom.latest.versionDir
-                    )}
-                    className="font-mono text-[13px] transition-colors hover:text-accent"
-                  >
-                    {rom.latest.version}
-                  </a>
-                ) : (
-                  "—"
-                )}
               </MetaRow>
               <MetaRow label="Releases">{String(rom.releaseCount)}</MetaRow>
             </MetaList>
@@ -251,25 +384,6 @@ export default async function RomPage({
           />
         </aside>
       </div>
-
-      {/* Latest release quick-download hint */}
-      {rom.latest && (rom.latest.downloads.primary || rom.latest.downloads.mirror) && (
-        <p className="mt-12 border-t border-line pt-5 text-[13px] text-faint">
-          The newest build is {rom.name} {rom.latest.version} — downloads are
-          hosted on{" "}
-          {rom.latest.downloads.primary
-            ? downloadHostLabel(rom.latest.downloads.primary)
-            : downloadHostLabel(rom.latest.downloads.mirror!)}
-          . See the{" "}
-          <a
-            href={releaseHref(rom.latest.romSlug, rom.latest.versionDir)}
-            className="text-accent underline decoration-accent/30 underline-offset-4 hover:decoration-accent"
-          >
-            release page
-          </a>{" "}
-          for requirements and warnings.
-        </p>
-      )}
     </div>
   );
 }
