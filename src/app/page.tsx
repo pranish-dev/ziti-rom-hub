@@ -46,28 +46,39 @@ export default function HomePage() {
             OnePlus Nord CE 3 5G. Read the warnings before flashing anything.
           </p>
 
-          <dl className="mt-8 grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-4">
+          {/* Archive statistics — each links into the archive */}
+          <nav
+            aria-label="Archive statistics"
+            className="mt-8 grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-4"
+          >
             {[
-              { label: "ROMs", value: String(stats.romCount) },
-              { label: "Releases", value: String(stats.releaseCount) },
+              { label: "ROMs", value: stats.romCount, href: "/ziti/roms" },
+              { label: "Releases", value: stats.releaseCount, href: "/releases" },
               {
                 label: "Official ROMs",
-                value: String(
-                  roms.filter((rom) => rom.support === "official").length
-                ),
+                value: roms.filter((rom) => rom.support === "official").length,
+                href: "/ziti/roms?status=official",
               },
-              { label: "Codename", value: "ziti" },
+              {
+                label: "Unofficial ROMs",
+                value: roms.filter((rom) => rom.support === "unofficial").length,
+                href: "/ziti/roms?status=unofficial",
+              },
             ].map((stat) => (
-              <div key={stat.label} className="bg-background px-4 py-3.5">
-                <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
+              <Link
+                key={stat.label}
+                href={stat.href}
+                className="group block bg-background px-4 py-3.5 transition-colors hover:bg-surface"
+              >
+                <span className="block font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
                   {stat.label}
-                </dt>
-                <dd className="mt-1 font-mono text-xl font-semibold text-fg">
+                </span>
+                <span className="mt-1 block font-mono text-xl font-semibold text-fg transition-colors group-hover:text-accent">
                   {stat.value}
-                </dd>
-              </div>
+                </span>
+              </Link>
             ))}
-          </dl>
+          </nav>
         </div>
       </section>
 
