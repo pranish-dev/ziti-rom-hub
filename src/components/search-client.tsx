@@ -2,39 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  loadSearchIndex,
+  searchEntries,
+  type SearchEntry,
+} from "@/lib/search";
 
-interface SearchEntry {
-  kind: "ROM" | "Release" | "Guide";
-  title: string;
-  subtitle: string;
-  url: string;
-  terms: string;
-}
-
-const KIND_ORDER: Record<SearchEntry["kind"], number> = {
-  Release: 0,
-  ROM: 1,
-  Guide: 2,
-};
-
-function scoreEntry(entry: SearchEntry, tokens: string[]): number | null {
-  const title = entry.title.toLowerCase();
-  const subtitle = entry.subtitle.toLowerCase();
-  let total = 0;
-
-  for (const token of tokens) {
-    let tokenScore: number | null = null;
-    if (title === token) tokenScore = 160;
-    else if (title.startsWith(token)) tokenScore = 110;
-    else if (title.includes(token)) tokenScore = 70;
-    else if (subtitle.includes(token)) tokenScore = 30;
-    else if (entry.terms.includes(token)) tokenScore = 12;
-    if (tokenScore === null) return null;
-    total += tokenScore;
-  }
-
-  return total;
-}
+const MAX_RESULTS = 30;
 
 export function SearchClient() {
   const [index, setIndex] = useState<SearchEntry[] | null>(null);
@@ -42,13 +16,16 @@ export function SearchClient() {
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Populate the query from /search?q=... so searches are shareable.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("q");
+    if (q) setQuery(q);
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
-    fetch("/search-index.json")
-      .then((response) => {
-        if (!response.ok) throw new Error(String(response.status));
-        return response.json() as Promise<SearchEntry[]>;
-      })
+    loadSearchIndex()
       .then((data) => {
         if (!cancelled) setIndex(data);
       })
@@ -60,40 +37,18 @@ export function SearchClient() {
     };
   }, []);
 
+  // Keep the URL in sync with the query (bookmarkable, no navigation).
   useEffect(() => {
-    function onKeyDown(event: KeyboardEvent) {
-      const target = event.target as HTMLElement | null;
-      const typing =
-        target &&
-        (target.tagName === "INPUT" ||
-          target.tagName === "TEXTAREA" ||
-          target.isContentEditable);
-      if (event.key === "/" && !typing) {
-        event.preventDefault();
-        inputRef.current?.focus();
-      }
-    }
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, []);
+    const q = query.trim();
+    const url = q ? `/search?q=${encodeURIComponent(q)}` : "/search";
+    window.history.replaceState(null, "", url);
+  }, [query]);
 
-  const results = useMemo(() => {
-    if (!index) return [];
-    const tokens = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
-    if (tokens.length === 0) return [];
-    const scored: Array<{ entry: SearchEntry; score: number }> = [];
-    for (const entry of index) {
-      const score = scoreEntry(entry, tokens);
-      if (score !== null) scored.push({ entry, score });
-    }
-    return scored
-      .sort(
-        (a, b) =>
-          b.score - a.score || KIND_ORDER[a.entry.kind] - KIND_ORDER[b.entry.kind]
-      )
-      .slice(0, 30)
-      .map((item) => item.entry);
-  }, [index, query]);
+  const hasQuery = query.trim().length > 0;
+  const results = useMemo(
+    () => (index ? searchEntries(index, query).slice(0, MAX_RESULTS) : []),
+    [index, query]
+  );
 
   return (
     <div>
@@ -104,7 +59,7 @@ export function SearchClient() {
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder='Search ROMs, releases, guides…   (press "/")'
+          placeholder={'Search ROMs, releases and guides...   (press "/")'}
           autoFocus
           className="h-12 w-full border border-line bg-surface px-4 text-[15px] text-fg placeholder:text-faint focus:border-muted/60 focus:outline-none focus-visible:outline-none"
         />
@@ -122,17 +77,25 @@ export function SearchClient() {
         </p>
       )}
 
-      {query.trim().length > 0 && index && (
+      {index && !hasQuery && (
+        <p className="mt-8 text-[14px] text-muted">
+          Search ROMs, releases and guides
+        </p>
+      )}
+
+      {index && hasQuery && (
         <>
           <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.18em] text-faint">
             {results.length} {results.length === 1 ? "result" : "results"}
           </p>
           <div className="mt-2">
             {results.length === 0 ? (
-              <p className="border-b border-line py-8 text-center text-[14px] text-muted">
-                Nothing found. Try a ROM name, version, maintainer or Android
-                version.
-              </p>
+              <div className="border-b border-line py-8 text-center">
+                <p className="text-[14px] text-muted">No results found</p>
+                <p className="mt-1 text-[12.5px] text-faint">
+                  Try a different search term.
+                </p>
+              </div>
             ) : (
               results.map((entry) => (
                 <Link

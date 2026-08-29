@@ -41,6 +41,12 @@ body {
   outline-offset: 2px;
 }
 
+/* The global-search dialog draws its own focus treatment on the row
+   (focus-within border) — the offset outline would overlap the icons. */
+.global-search-input:focus-visible {
+  outline: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

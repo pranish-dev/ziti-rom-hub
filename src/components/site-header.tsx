@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { site } from "@/lib/site";
+import { GlobalSearch } from "@/components/global-search";
 
 const NAV_ITEMS = [
   { href: "/ziti/roms", label: "ROMs" },
@@ -95,9 +96,11 @@ export function SiteHeader() {
           </a>
         </nav>
 
-        <button
-          type="button"
-          onClick={() => setOpen((value) => !value)}
+        <div className="flex items-center gap-1 md:gap-3">
+          <GlobalSearch />
+          <button
+            type="button"
+            onClick={() => setOpen((value) => !value)}
           aria-expanded={open}
           aria-controls="mobile-nav"
           className="-mr-2 flex h-11 w-11 items-center justify-center text-muted hover:text-fg md:hidden"
@@ -121,6 +124,7 @@ export function SiteHeader() {
             )}
           </svg>
         </button>
+        </div>
       </div>
 
       {open && (

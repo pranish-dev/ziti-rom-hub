@@ -14,14 +14,7 @@ import path from "node:path";
 
 import { getAllGuides, getAllRoms, getAllReleases } from "../src/lib/content";
 import { formatReleaseDate, releaseHref, romHref } from "../src/lib/format";
-
-interface SearchEntry {
-  kind: "ROM" | "Release" | "Guide";
-  title: string;
-  subtitle: string;
-  url: string;
-  terms: string;
-}
+import type { SearchEntry } from "../src/lib/search";
 
 function toTerms(parts: Array<string | undefined>): string {
   return parts
