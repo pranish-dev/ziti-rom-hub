@@ -9,6 +9,7 @@ maintainer: Arka
 downloads:
   primary: 
   mirror: "https://gofile.io/d/t2Ep5n5E"
+  recovery: "https://gofile.io/d/XFdCw66r"
   changelog: 
 requirements:
   arb: "Do not downgrade firmware below the level required by this build. Read the warnings first."
@@ -28,8 +29,7 @@ credits:
   - "@pigowtham — base trees"
 ---
 
-## Highlights
-- [Recovery](https://gofile.io/d/XFdCw66r)
+
 ## Installation notes
 
 1. Boot into recovery .

@@ -200,6 +200,7 @@ export default async function ReleasePage({
           {/* Downloads */}
           {(release.downloads.primary ||
             release.downloads.mirror ||
+            release.downloads.recovery ||
             release.downloads.changelog) && (
             <section aria-labelledby="downloads-heading">
               <SectionHead label="Downloads" />
@@ -222,6 +223,16 @@ export default async function ReleasePage({
                     className="btn-secondary"
                   >
                     Mirror ({downloadHostLabel(release.downloads.mirror)}) ↗
+                  </a>
+                )}
+                {release.downloads.recovery && (
+                  <a
+                    href={release.downloads.recovery}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-secondary"
+                  >
+                    Recovery ↗
                   </a>
                 )}
                 {release.downloads.changelog && (

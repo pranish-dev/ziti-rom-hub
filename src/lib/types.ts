@@ -32,6 +32,8 @@ export interface Rom {
 export interface Downloads {
   primary?: string;
   mirror?: string;
+  /** Optional link to a custom recovery image for this release. */
+  recovery?: string;
   changelog?: string;
 }
 

@@ -104,6 +104,7 @@ export const downloadsSchema = z
   .object({
     primary: field(urlField.optional()),
     mirror: field(urlField.optional()),
+    recovery: field(urlField.optional()),
     changelog: field(urlField.optional()),
   })
   .strict();

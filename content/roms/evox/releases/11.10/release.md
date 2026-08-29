@@ -11,6 +11,7 @@ downloads:
   primary: "https://sourceforge.net/projects/evox-unofficial-ziti/files/Release/"
   mirror: 
   changelog: "https://raw.githubusercontent.com/anchalsehrawat/Evox_OTA/refs/heads/bka/changelogs/ziti.txt"
+  recovery: "https://sourceforge.net/projects/evox-unofficial-ziti/files/Recovery/evox_ziti_recovery-unofficial-withPTools-20260321.zip/download"
 requirements:
   arb: "Do not downgrade firmware below the level required by this build. Read the warnings first."
 warnings:
@@ -32,7 +33,6 @@ credits:
 ---
 
 ## Highlights
-- [Recovery](https://sourceforge.net/projects/evox-unofficial-ziti/files/Recovery/evox_ziti_recovery-unofficial-withPTools-20260321.zip/download)
 - KernelSU Next updated to **v3.3.0**, paired with **SusFS v2.1.0**.
 
 ## Installation notes

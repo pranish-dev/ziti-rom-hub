@@ -10,6 +10,7 @@ downloads:
   primary: "https://github.com/pjgowtham/android_device_oneplus_ziti/releases/download/lineage-23.2-20260624-UNOFFICIAL-ziti/lineage-23.2-20260624-UNOFFICIAL-ziti.zip/"
   mirror: 
   changelog: 
+  recovery: "https://github.com/pjgowtham/android_device_oneplus_ziti/releases/tag/lineage-23.2-20260624-UNOFFICIAL-ziti"
 requirements:
   arb: "Do not downgrade firmware below the level required by this build. Read the warnings first."
 warnings:
@@ -22,7 +23,6 @@ credits:
 ---
 
 ## Highlights
-- [Recovery](https://github.com/pjgowtham/android_device_oneplus_ziti/releases/tag/lineage-23.2-20260624-UNOFFICIAL-ziti)
 - [Recommended Gapps](https://github.com/MindTheGapps/16.0.0-arm64/releases/tag/MindTheGapps-16.0.0-arm64-20250709_200551)
 
 ## Installation notes
