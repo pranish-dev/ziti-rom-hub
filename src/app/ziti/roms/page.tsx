@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { StatusBadge } from "@/components/status-badge";
 import { getAllRoms } from "@/lib/content";
 import { formatReleaseDate } from "@/lib/format";
 import { buildOpenGraph, buildTwitter } from "@/lib/seo";
@@ -52,13 +53,11 @@ export default function RomsIndexPage() {
                 <span className="block text-[16px] font-semibold text-fg transition-colors group-hover:text-accent">
                   {rom.name}
                 </span>
-                <span className="mt-1 block font-mono text-[11px] uppercase tracking-[0.14em] text-faint">
-                  {rom.support === "official" ? (
-                    <span className="text-accent">Official</span>
-                  ) : (
-                    <span>Unofficial</span>
-                  )}{" "}
-                  · {rom.androidBase} · Maintainer{" "}
+                <span className="mt-1 flex flex-wrap items-center gap-x-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-faint">
+                  <StatusBadge support={rom.support} />
+                  <span>{rom.androidBase}</span>
+                  <span>·</span>
+                  <span>Maintainer{" "}
                   {rom.maintainerTelegram ? (
                     <a
                       href={rom.maintainerTelegram}
@@ -70,7 +69,7 @@ export default function RomsIndexPage() {
                     </a>
                   ) : (
                     rom.maintainer
-                  )}
+                  )}</span>
                 </span>
               </span>
               <span className="max-w-xl self-center text-[13px] leading-relaxed text-muted line-clamp-2">

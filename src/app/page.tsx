@@ -127,6 +127,7 @@ export default function HomePage() {
                   href={`/ziti/roms/${rom.slug}`}
                   description={rom.description}
                   androidBase={rom.androidBase}
+                  support={rom.support}
                   latestVersion={rom.latest?.version}
                   releaseCount={rom.releaseCount}
                 />

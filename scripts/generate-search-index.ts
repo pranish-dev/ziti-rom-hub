@@ -31,7 +31,7 @@ async function main() {
     entries.push({
       kind: "ROM",
       title: rom.name,
-      subtitle: `${rom.device} · ${rom.androidBase} · ${rom.maintainer}`,
+      subtitle: `${rom.support === "official" ? "Official" : "Unofficial"} · ${rom.device} · ${rom.androidBase} · ${rom.maintainer}`,
       url: romHref(rom),
       terms: toTerms([
         rom.name,
@@ -40,6 +40,7 @@ async function main() {
         rom.device,
         rom.maintainer,
         rom.androidBase,
+        rom.support,
         rom.description,
       ]),
     });
@@ -54,6 +55,7 @@ async function main() {
       terms: toTerms([
         release.rom.name,
         release.rom.codename,
+        release.rom.support,
         release.version,
         release.android,
         release.qpr,

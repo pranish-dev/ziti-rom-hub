@@ -6,6 +6,7 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { MarkdownBody } from "@/components/markdown-body";
 import { MetaList, MetaRow, SectionHead } from "@/components/section-head";
 import { ScreenshotGallery } from "@/components/screenshot-gallery";
+import { StatusBadge } from "@/components/status-badge";
 import { WarningBox } from "@/components/warning-box";
 import { getAllReleases, getRelease } from "@/lib/content";
 import {
@@ -148,6 +149,7 @@ export default async function ReleasePage({
           <span className="font-mono tracking-tight text-accent">
             {release.version}
           </span>
+          <StatusBadge support={rom.support} className="align-middle" />
           {release.build === "hotfix" && (
             <span className="badge-new align-middle">Hotfix</span>
           )}

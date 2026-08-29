@@ -1,5 +1,6 @@
 import Link from "next/link";
-import type { ReleaseListItem } from "@/lib/types";
+import { StatusBadge } from "@/components/status-badge";
+import type { ReleaseListItem, Rom } from "@/lib/types";
 
 /**
  * Dense editorial row for a release. Presentational only — safe to use
@@ -53,6 +54,7 @@ export function RomRow({
   href,
   description,
   androidBase,
+  support,
   latestVersion,
   releaseCount,
 }: {
@@ -60,6 +62,7 @@ export function RomRow({
   href: string;
   description?: string;
   androidBase: string;
+  support?: Rom["support"];
   latestVersion?: string;
   releaseCount: number;
 }) {
@@ -69,8 +72,11 @@ export function RomRow({
       className="group -mx-2 grid gap-1 border-b border-line px-2 py-4 transition-colors last:border-b-0 hover:bg-surface sm:-mx-3 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-6 sm:px-3"
     >
       <div className="min-w-0">
-        <span className="text-[15px] font-semibold text-fg transition-colors group-hover:text-accent">
-          {name}
+        <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="text-[15px] font-semibold text-fg transition-colors group-hover:text-accent">
+            {name}
+          </span>
+          {support && <StatusBadge support={support} />}
         </span>
         {description && (
           <p className="mt-0.5 line-clamp-1 max-w-xl text-[13px] text-muted">

@@ -32,6 +32,9 @@ const KIND_ORDER: Record<SearchEntry["kind"], number> = {
   Guide: 2,
 };
 
+/** Status keywords must match as whole words ("unofficial" contains "official"). */
+const STATUS_KEYWORDS = new Set(["official", "unofficial"]);
+
 /**
  * Lowercase and collapse punctuation/underscores to spaces, so e.g. the query
  * "312" still matches "3.12-Hotfix" and "evolution x" matches "EvolutionX".
@@ -83,23 +86,43 @@ export function scoreEntry(entry: SearchEntry, tokens: string[]): number | null 
   const foldedSubtitle = fold(entry.subtitle);
   const foldedTerms = fold(entry.terms);
 
+  // "Unofficial" contains the substring "official", so status keywords must
+  // match as whole words — searching "official" must not return unofficial ROMs.
+  const wholeWordTokens = new Set(foldedTitle.split(/\s+/).filter(Boolean));
+  const wholeWordSubtitle = new Set(foldedSubtitle.split(/\s+/).filter(Boolean));
+  const wholeWordTerms = new Set(foldedTerms.split(/\s+/).filter(Boolean));
+
   let total = 0;
   for (const token of tokens) {
     const foldedToken = fold(token);
-    let score = tierScore(
-      title, foldedTitle, token, foldedToken, 160, 110, 70
-    );
-    if (score === null) {
+    let score: number | null = null;
+
+    // Status/category keywords ("official", "unofficial"): whole-word match only.
+    if (STATUS_KEYWORDS.has(token)) {
+      if (wholeWordTokens.has(foldedToken)) score = 160;
+      else if (wholeWordSubtitle.has(foldedToken)) score = 30;
+      else if (wholeWordTerms.has(foldedToken)) score = 12;
+    } else {
       score = tierScore(
-        subtitle, foldedSubtitle, token, foldedToken, 40, 34, 30
+        title, foldedTitle, token, foldedToken, 160, 110, 70
       );
+      if (score === null) {
+        score = tierScore(
+          subtitle, foldedSubtitle, token, foldedToken, 40, 34, 30
+        );
+      }
+      if (score === null && terms.includes(token)) {
+        score = 12;
+      }
+      if (
+        score === null &&
+        foldedToken.length > 0 &&
+        foldedTerms.includes(foldedToken)
+      ) {
+        score = 8;
+      }
     }
-    if (score === null && terms.includes(token)) {
-      score = 12;
-    }
-    if (score === null && foldedToken.length > 0 && foldedTerms.includes(foldedToken)) {
-      score = 8;
-    }
+
     if (score === null) return null;
     total += score;
   }
