@@ -1,9 +1,11 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ReleaseRow, RomRow } from "@/components/release-row";
+import { RomRow } from "@/components/release-row";
+import { ReleaseTimeline } from "@/components/release-timeline";
+import { LATEST_RELEASES_LIMIT, type TimelineItem } from "@/lib/timeline";
 import { SectionHead } from "@/components/section-head";
-import { getAllGuides, getAllRoms, getHubStats, getRecentReleases } from "@/lib/content";
-import { toReleaseListItem } from "@/lib/format";
+import { getAllGuides, getAllRoms, getAllReleases, getHubStats } from "@/lib/content";
+import { formatReleaseDate, releaseHref } from "@/lib/format";
 import { site } from "@/lib/site";
 import { buildOpenGraph, buildTwitter } from "@/lib/seo";
 
@@ -21,7 +23,6 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  const recentReleases = getRecentReleases(6);
   const roms = [...getAllRoms()].sort((a, b) => {
     if (!a.latest) return 1;
     if (!b.latest) return -1;
@@ -29,6 +30,27 @@ export default function HomePage() {
   });
   const guides = getAllGuides();
   const stats = getHubStats();
+
+  // Global timeline: every ROM's releases, already sorted newest first by the
+  // loader, trimmed to the preview limit.
+  const timelineItems: TimelineItem[] = getAllReleases()
+    .slice(0, LATEST_RELEASES_LIMIT)
+    .map((release, index) => ({
+      romName: release.rom.name,
+      version: release.version,
+      href: releaseHref(release.romSlug, release.versionDir),
+      dateISO: release.releaseDate,
+      dateLabel: formatReleaseDate(release.releaseDate),
+      meta: [
+        release.android,
+        release.qpr,
+        release.buildType.length > 0 ? release.buildType.join(" / ") : null,
+        release.rom.support === "official" ? "Official" : "Unofficial",
+      ]
+        .filter(Boolean)
+        .join(" • "),
+      isLatest: index === 0,
+    }));
 
   return (
     <>
@@ -146,20 +168,24 @@ export default function HomePage() {
             </div>
           </section>
 
-          <section aria-labelledby="recent-releases">
+          <section aria-label="Release timeline">
             <SectionHead
-              label="Recent releases"
+              label="Release Timeline"
               href="/releases"
               linkLabel="All releases"
             />
-            <div>
-              {recentReleases.map((release) => (
-                <ReleaseRow
-                  key={`${release.romSlug}-${release.versionDir}`}
-                  item={toReleaseListItem(release, release.rom)}
-                />
-              ))}
+            <p className="-mt-2 max-w-xl text-[13px] leading-relaxed text-muted">
+              Latest releases across the ziti ROM ecosystem.
+            </p>
+            <div className="mt-6">
+              <ReleaseTimeline items={timelineItems} />
             </div>
+            <Link
+              href="/releases"
+              className="mt-7 inline-block font-mono text-[11px] font-medium uppercase tracking-[0.16em] text-muted transition-colors hover:text-accent"
+            >
+              View all releases <span aria-hidden="true">→</span>
+            </Link>
           </section>
         </div>
 

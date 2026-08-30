@@ -392,3 +392,84 @@ body {
   scrollbar-width: thin;
   scrollbar-color: #333333 var(--color-background);
 }
+
+/* ------------------------------------------------------------------ */
+/* Release timeline (<ReleaseTimeline/>)                               */
+/*                                                                     */
+/* Scroll reveal + a SINGLE red active marker that glides between      */
+/* items on hover/focus (a vertical connector rail is intentionally    */
+/* not used). Scroll-reveal and cursor motion only apply when          */
+/* scripting is enabled AND the user allows motion.                    */
+/* ------------------------------------------------------------------ */
+
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  /* Per-item neutral marker + content reveal. */
+  .tl-dot {
+    opacity: 0;
+    scale: 0.85;
+    translate: 0 8px;
+    transition:
+      opacity 300ms ease-out,
+      scale 300ms ease-out,
+      translate 300ms ease-out,
+      border-color 200ms ease-out,
+      background-color 200ms ease-out;
+  }
+
+  .tl-content {
+    opacity: 0;
+    translate: 0 12px;
+    transition:
+      opacity 650ms ease-out,
+      translate 650ms ease-out;
+  }
+
+  .tl-item.is-visible .tl-dot {
+    opacity: 1;
+    scale: 1;
+    translate: 0 0;
+  }
+
+  .tl-item.is-visible .tl-content {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  /* Single red active marker — glides between releases (250ms transform). */
+  .tl-cursor {
+    transition:
+      transform 250ms ease-out,
+      opacity 200ms ease-out;
+  }
+
+  /* Subtle active-row nudge, kept to a gentle 2px. */
+  .tl-item[data-active="true"] .tl-content {
+    transform: translateX(2px);
+  }
+}
+
+/* The one active marker. Positioned by the component's translateY; hidden
+   until the first reveal so it never floats over un-revealed content.
+   pointer-events: none keeps it from interfering with hover/focus. */
+.tl-cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 0.625rem;
+  width: 0.625rem;
+  border-radius: 9999px;
+  background-color: var(--color-accent);
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform;
+}
+
+.tl-root.is-revealed .tl-cursor {
+  opacity: 1;
+}
+
+/* The active row's neutral marker makes way for the single red cursor —
+   ONE red bullet, not a red dot sitting on top of a hollow one. */
+.tl-item[data-active="true"] .tl-dot {
+  opacity: 0;
+}
