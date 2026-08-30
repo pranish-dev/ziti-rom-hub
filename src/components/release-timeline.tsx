@@ -4,6 +4,18 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { TimelineItem } from "@/lib/timeline";
 
+/**
+ * Global release timeline — a vertical, chronological preview of the latest
+ * releases across every ROM. Items are mapped from `getAllReleases()` by the
+ * homepage at build time (server side).
+ *
+ * Interaction: ONE red active marker. It sits on the latest release by
+ * default, glides to whichever release is hovered (or keyboard-focused), and
+ * returns to the latest when the pointer leaves the timeline. The marker is a
+ * single absolutely positioned element translated with a CSS transform — no
+ * per-item red dots, no per-frame JS. Reduced-motion users get an instant
+ * switch (no transition) via CSS media queries.
+ */
 export function ReleaseTimeline({ items }: { items: TimelineItem[] }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef(new Map<string, HTMLLIElement>());

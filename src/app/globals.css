@@ -394,7 +394,12 @@ body {
 }
 
 /* ------------------------------------------------------------------ */
-/* Release timeline (<ReleaseTimeline/>)                               */                   */
+/* Release timeline (<ReleaseTimeline/>)                               */
+/*                                                                     */
+/* Scroll reveal + a SINGLE red active marker that glides between      */
+/* items on hover/focus (a vertical connector rail is intentionally    */
+/* not used). Scroll-reveal and cursor motion only apply when          */
+/* scripting is enabled AND the user allows motion.                    */
 /* ------------------------------------------------------------------ */
 
 @media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
@@ -443,6 +448,9 @@ body {
   }
 }
 
+/* The one active marker. Positioned by the component's translateY; hidden
+   until the first reveal so it never floats over un-revealed content.
+   pointer-events: none keeps it from interfering with hover/focus. */
 .tl-cursor {
   position: absolute;
   top: 0;
