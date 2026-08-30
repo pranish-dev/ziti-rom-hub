@@ -1,8 +1,8 @@
 ---
-version: "6.0"
+version: "6.0 Unofficial"
 release_date: "2026-08-21"
 android: "Android 17"
-qpr: "QPR2"
+qpr: "Initial"
 build_type:
   - Vanilla
 maintainer: "okkotsu"
