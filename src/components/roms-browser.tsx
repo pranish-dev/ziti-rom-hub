@@ -12,7 +12,6 @@ export interface RomsListItem {
   support: "official" | "unofficial";
   androidBase: string;
   maintainer: string;
-  maintainerTelegram?: string;
   description: string;
   latestVersion?: string;
   latestDate?: string;
@@ -101,21 +100,9 @@ export function RomsBrowser({ roms }: { roms: RomsListItem[] }) {
                   <StatusBadge support={rom.support} />
                   <span>{rom.androidBase}</span>
                   <span>·</span>
-                  <span>
-                    Maintainer{" "}
-                    {rom.maintainerTelegram ? (
-                      <a
-                        href={rom.maintainerTelegram}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline decoration-line underline-offset-2 transition-colors hover:text-accent hover:decoration-accent"
-                      >
-                        {rom.maintainer}
-                      </a>
-                    ) : (
-                      rom.maintainer
-                    )}
-                  </span>
+                  {/* Plain text: the row is a link, and <a> cannot nest inside <a>.
+                      The clickable Telegram link lives on the ROM detail page. */}
+                  <span>Maintainer {rom.maintainer}</span>
                 </span>
               </span>
               <span className="max-w-xl self-center text-[13px] leading-relaxed text-muted line-clamp-2">

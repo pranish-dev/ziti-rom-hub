@@ -1,4 +1,4 @@
-import type { Release, ReleaseListItem, Rom, RomWithReleases } from "./types";
+import type { Kernel, Release, ReleaseListItem, Rom, RomWithReleases } from "./types";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const NEW_WINDOW_MS = 7 * DAY_MS;
@@ -35,6 +35,17 @@ export function releaseHref(
   versionDir: string
 ): string {
   return `/ziti/roms/${romSlug}/${versionDir}`;
+}
+
+export function kernelHref(kernel: Pick<Kernel, "slug">): string {
+  return `/kernels/${kernel.slug}`;
+}
+
+export function kernelReleaseHref(
+  kernelSlug: string,
+  versionDir: string
+): string {
+  return `/kernels/${kernelSlug}/${versionDir}`;
 }
 
 /** Flatten a release + ROM into the serializable list-item shape. */

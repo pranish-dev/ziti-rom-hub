@@ -7,7 +7,7 @@
  */
 
 export interface SearchEntry {
-  kind: "ROM" | "Release" | "Guide";
+  kind: "ROM" | "Release" | "Kernel" | "Kernel Release" | "Guide";
   title: string;
   subtitle: string;
   url: string;
@@ -25,11 +25,13 @@ export async function loadSearchIndex(): Promise<SearchEntry[]> {
   return (await response.json()) as SearchEntry[];
 }
 
-/** Release results first, then ROMs, then guides — for equal scores. */
+/** Release results first, then kernels, then ROMs, then guides. */
 const KIND_ORDER: Record<SearchEntry["kind"], number> = {
   Release: 0,
-  ROM: 1,
-  Guide: 2,
+  "Kernel Release": 1,
+  ROM: 2,
+  Kernel: 3,
+  Guide: 4,
 };
 
 /** Status keywords must match as whole words ("unofficial" contains "official"). */

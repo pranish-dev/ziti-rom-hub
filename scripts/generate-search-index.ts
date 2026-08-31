@@ -12,8 +12,20 @@
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import { getAllGuides, getAllRoms, getAllReleases } from "../src/lib/content";
-import { formatReleaseDate, releaseHref, romHref } from "../src/lib/format";
+import {
+  getAllGuides,
+  getAllKernelReleases,
+  getAllKernels,
+  getAllRoms,
+  getAllReleases,
+} from "../src/lib/content";
+import {
+  formatReleaseDate,
+  kernelHref,
+  kernelReleaseHref,
+  releaseHref,
+  romHref,
+} from "../src/lib/format";
 import type { SearchEntry } from "../src/lib/search";
 
 function toTerms(parts: Array<string | undefined>): string {
@@ -74,6 +86,48 @@ async function main() {
       subtitle: "Guide · OnePlus Nord CE 3 5G (ziti)",
       url: `/guides/${guide.slug}`,
       terms: toTerms([guide.title, guide.slug, guide.description]),
+    });
+  }
+
+  for (const kernel of getAllKernels()) {
+    entries.push({
+      kind: "Kernel",
+      title: kernel.name,
+      subtitle: `${kernel.android ?? "Android"} · ${kernel.maintainer}`,
+      url: kernelHref(kernel),
+      terms: toTerms([
+        kernel.name,
+        kernel.slug,
+        kernel.maintainer,
+        kernel.android,
+        kernel.linux,
+        kernel.description,
+        ...kernel.features,
+      ]),
+    });
+  }
+
+  for (const release of getAllKernelReleases()) {
+    entries.push({
+      kind: "Kernel Release",
+      title: `${release.kernel.name} ${release.version}`,
+      subtitle: `${release.android}${
+        release.linux ? ` · Linux ${release.linux}` : ""
+      } · ${formatReleaseDate(release.releaseDate)}`,
+      url: kernelReleaseHref(release.kernelSlug, release.versionDir),
+      terms: toTerms([
+        release.kernel.name,
+        release.kernel.slug,
+        release.version,
+        release.android,
+        release.linux,
+        release.kernelSu,
+        release.susfs,
+        ...release.supportedROMs,
+        ...release.supportedOOS,
+        release.releaseDate,
+        release.bodyExcerpt,
+      ]),
     });
   }
 

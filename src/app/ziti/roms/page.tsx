@@ -37,7 +37,6 @@ export default function RomsIndexPage() {
     support: rom.support,
     androidBase: rom.androidBase,
     maintainer: rom.maintainer,
-    maintainerTelegram: rom.maintainerTelegram,
     description: rom.description,
     latestVersion: rom.latest?.version,
     latestDate: rom.latest?.releaseDate,

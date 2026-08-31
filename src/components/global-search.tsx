@@ -277,7 +277,7 @@ export function GlobalSearch() {
                           i === clampedActive ? "bg-surface" : ""
                         }`}
                       >
-                        <span className="mt-0.5 w-[64px] shrink-0 border border-line bg-raised px-1.5 py-0.5 text-center font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+                        <span className="mt-0.5 min-w-[64px] shrink-0 border border-line bg-raised px-1.5 py-0.5 text-center font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
                           {entry.kind}
                         </span>
                         <span className="min-w-0 flex-1">

@@ -157,6 +157,75 @@ export const guideSchema = z
   })
   .strict();
 
+/**
+ * Kernel metadata (content/kernels/<slug>/kernel.md).
+ *
+ * Kernels are a first-class section alongside ROMs but with their own
+ * metadata: no device/codename (kernels are for this site's single device),
+ * no QPR/build machinery — instead Linux version, KernelSU/SUSFS info and
+ * the kernel source repository.
+ */
+export const kernelSchema = z
+  .object({
+    name: field(
+      z.string({ required_error: "is required" }).min(1, "cannot be empty")
+    ),
+    slug: field(
+      z
+        .string({ required_error: "is required" })
+        .min(1)
+        .regex(SLUG_RE, "slug must be kebab-case (lowercase letters, digits, hyphens)")
+    ),
+    maintainer: field(
+      z.string({ required_error: "is required" }).min(1, "cannot be empty")
+    ),
+    maintainer_telegram: field(urlField.optional()),
+    source: field(urlField.optional()),
+    android: field(z.string().min(1).optional()),
+    linux: field(z.string().min(1).optional()),
+    features: field(z.array(field(z.string().min(1))).default([])),
+    description: field(
+      z.string({ required_error: "is required" }).min(1, "cannot be empty")
+    ),
+  })
+  .strict();
+
+/**
+ * Kernel release metadata (content/kernels/<slug>/releases/<version>/release.md).
+ * The markdown body is the changelog / flashing notes.
+ */
+export const kernelReleaseSchema = z
+  .object({
+    version: field(
+      z.string({ required_error: "is required" }).min(1, "cannot be empty")
+    ),
+    release_date: isoDate,
+    android: field(
+      z.string({ required_error: "is required" }).min(1, "cannot be empty")
+    ),
+    linux: field(z.string().min(1).optional()),
+    kernel_su: field(z.string().min(1).optional()),
+    susfs: field(z.string().min(1).optional()),
+    supported_oos: field(z.array(field(z.string().min(1))).default([])),
+    supported_roms: field(z.array(field(z.string().min(1))).default([])),
+    downloads: field(downloadsSchema.default({})),
+    source: field(urlField.optional()),
+    changelog: field(urlField.optional()),
+    /**
+     * Whether the build includes KernelSU. Accepts booleans or the strings
+     * "yes"/"no" (js-yaml keeps `yes`/`no` as strings in YAML 1.2).
+     */
+    ksu: field(
+      z
+        .union([z.boolean(), z.enum(["yes", "no", "true", "false"])])
+        .transform(
+          (value) => value === true || value === "yes" || value === "true"
+        )
+        .default(false)
+    ),
+  })
+  .strict();
+
 /** Format a Zod failure as a human-readable, file-anchored error block. */
 export function formatContentError(
   kind: string,

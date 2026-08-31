@@ -8,6 +8,7 @@ import { GlobalSearch } from "@/components/global-search";
 
 const NAV_ITEMS = [
   { href: "/ziti/roms", label: "ROMs" },
+  { href: "/kernels", label: "Kernels" },
   { href: "/releases", label: "Releases" },
   { href: "/guides", label: "Guides" },
   { href: "/warnings", label: "Warnings", accent: true },

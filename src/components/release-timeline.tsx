@@ -147,7 +147,7 @@ export function ReleaseTimeline({ items }: { items: TimelineItem[] }) {
                       </time>
                       <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
                         <span className="text-[14.5px] font-semibold text-fg transition-colors group-hover:text-accent">
-                          {item.romName}
+                          {item.name}
                         </span>
                         <span className="font-mono text-[13.5px] font-medium text-muted transition-colors group-hover:text-accent">
                           {item.version}

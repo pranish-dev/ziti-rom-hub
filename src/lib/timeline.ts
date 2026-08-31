@@ -11,7 +11,8 @@
 export const LATEST_RELEASES_LIMIT = 10;
 
 export interface TimelineItem {
-  romName: string;
+  /** ROM or kernel name. */
+  name: string;
   version: string;
   href: string;
   dateISO: string;

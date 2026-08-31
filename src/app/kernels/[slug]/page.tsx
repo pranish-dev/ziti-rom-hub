@@ -1,24 +1,31 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { ReleaseArchive } from "@/components/release-archive";
 import { MetaList, MetaRow, SectionHead } from "@/components/section-head";
 import { WarningBox } from "@/components/warning-box";
-import { getAllRoms, getRom } from "@/lib/content";
+import { getAllKernels, getKernel } from "@/lib/content";
 import {
   downloadHostLabel,
   formatReleaseDate,
-  isNewRelease,
-  releaseHref,
+  kernelReleaseHref,
 } from "@/lib/format";
 import { buildOpenGraph, buildTwitter } from "@/lib/seo";
-import type { Release } from "@/lib/types";
+import { site } from "@/lib/site";
 
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return getAllRoms().map((rom) => ({ slug: rom.slug }));
+  const kernels = getAllKernels();
+  if (kernels.length === 0) {
+    // `output: "export"` cannot build a dynamic route with zero params —
+    // export a placeholder that renders 404 via notFound() until real
+    // kernel content exists.
+    return [{ slug: "ziti-no-kernels-yet" }];
+  }
+  return kernels.map((kernel) => ({ slug: kernel.slug }));
 }
 
 export async function generateMetadata({
@@ -27,85 +34,39 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const rom = getRom(slug);
-  if (!rom) return {};
-  const title = `${rom.name} for the ${rom.device} (${rom.codename})`;
+  const kernel = getKernel(slug);
+  if (!kernel) return {};
+  const title = `${kernel.name} kernel for the ${site.device} (${site.codename})`;
   const description = [
-    `${rom.name} releases and downloads for the ${rom.device} (${rom.codename}).`,
-    rom.latest
-      ? `Latest: ${rom.latest.version} · ${rom.androidBase}.`
-      : `Based on ${rom.androidBase}.`,
-  ].join(" ");
-  // Prefer the latest release banner as the share image; fall back to og.png.
-  const image = rom.latest?.banner
-    ? {
-        url: rom.latest.banner,
-        width: rom.latest.bannerWidth,
-        height: rom.latest.bannerHeight,
-        alt: `${rom.name} ${rom.latest.version} banner`,
-      }
-    : null;
+    `${kernel.name} kernel releases and downloads for the ${site.device} (${site.codename}).`,
+    kernel.latest ? `Latest: ${kernel.latest.version}.` : undefined,
+  ]
+    .filter(Boolean)
+    .join(" ");
   return {
     title,
     description,
-    alternates: { canonical: `/ziti/roms/${rom.slug}` },
+    alternates: { canonical: `/kernels/${kernel.slug}` },
     openGraph: buildOpenGraph({
       title,
       description,
-      path: `/ziti/roms/${rom.slug}`,
-      image,
+      path: `/kernels/${kernel.slug}`,
     }),
-    twitter: buildTwitter({ title, description, image }),
+    twitter: buildTwitter({ title, description }),
   };
 }
 
-function ExternalLinkRow({
-  label,
-  url,
-}: {
-  label: string;
-  url: string;
-}) {
-  return (
-    <li>
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="group flex items-center justify-between gap-3 border-b border-line-soft py-2.5 text-[13.5px] text-muted transition-colors last:border-b-0 hover:text-accent"
-      >
-        <span className="truncate">{label}</span>
-        <span aria-hidden="true" className="shrink-0 text-faint group-hover:text-accent">
-          ↗
-        </span>
-      </a>
-    </li>
-  );
-}
-
-/** Compact "Android · QPR · Variants" line for a release. */
-function releaseMeta(release: Release): string {
-  return [
-    release.android,
-    release.qpr,
-    release.buildType.length > 0 ? release.buildType.join(" / ") : null,
-  ]
-    .filter(Boolean)
-    .join(" • ");
-}
-
-export default async function RomPage({
+export default async function KernelPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const rom = getRom(slug);
-  if (!rom) notFound();
+  const kernel = getKernel(slug);
+  if (!kernel) notFound();
 
-  // `rom.latest` and `rom.releases` come pre-sorted (newest first) from the
-  // content loader — this page never re-derives ordering or counts.
-  const latest = rom.latest;
+  // The loader sorts releases newest first, so index 0 is latest.
+  const latest = kernel.latest;
   const downloadUrl = latest?.downloads.primary ?? latest?.downloads.mirror;
 
   const facts: Array<{
@@ -115,55 +76,37 @@ export default async function RomPage({
     external?: boolean;
     accent?: boolean;
   }> = [
-    { label: "Android", value: rom.androidBase },
-    {
-      label: "Status",
-      value: rom.support === "official" ? "Official" : "Unofficial",
-      accent: rom.support === "official",
-    },
+    { label: "Android", value: latest?.android ?? kernel.android ?? "—" },
+    { label: "Linux", value: latest?.linux ?? kernel.linux ?? "—" },
     {
       label: "Maintainer",
-      value: rom.maintainer,
-      href: rom.maintainerTelegram,
+      value: kernel.maintainer,
+      href: kernel.maintainerTelegram,
       external: true,
     },
-    {
-      label: "Latest",
-      value: latest ? latest.version : "—",
-      href: latest ? releaseHref(latest.romSlug, latest.versionDir) : undefined,
-    },
   ];
-  const factCols =
-    facts.length >= 6
-      ? "lg:grid-cols-6"
-      : facts.length === 5
-        ? "lg:grid-cols-5"
-        : "lg:grid-cols-4";
 
   return (
     <div className="container-page pb-16 pt-10 sm:pt-12">
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },
-          { label: "ROMs", href: "/ziti/roms" },
-          { label: rom.name },
+          { label: "Kernels", href: "/kernels" },
+          { label: kernel.name },
         ]}
       />
 
       <header>
-        <p className="eyebrow-accent">Custom ROM</p>
+        <p className="eyebrow-accent">Kernel</p>
         <h1 className="mt-3 font-display text-3xl font-bold tracking-tight sm:text-4xl">
-          {rom.name}
+          {kernel.name}
         </h1>
         <p className="mt-2 flex flex-wrap items-center gap-x-2 text-[14px] text-muted">
-          For the {rom.device}
-          <span className="chip">{rom.codename}</span>
+          For the {site.device}
+          <span className="chip">{site.codename}</span>
         </p>
 
-        {/* Compact facts strip — Android version, status, maintainer, latest. */}
-        <dl
-          className={`mt-8 grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 ${factCols}`}
-        >
+        <dl className="mt-8 grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-4">
           {facts.map((fact) => (
             <div key={fact.label} className="bg-background px-3.5 py-3">
               <dt className="font-mono text-[10px] uppercase tracking-[0.18em] text-faint">
@@ -193,12 +136,27 @@ export default async function RomPage({
         </dl>
       </header>
 
+      {/* Kernel banner — kernel-root banner, or the latest release's. */}
+      {kernel.banner && (
+        <div className="mt-8 border border-line bg-surface">
+          <Image
+            src={kernel.banner}
+            alt={`${kernel.name} kernel banner`}
+            width={kernel.bannerWidth ?? 1600}
+            height={kernel.bannerHeight ?? 900}
+            priority
+            sizes="(max-width: 1152px) 100vw, 1104px"
+            className="h-auto w-full"
+          />
+        </div>
+      )}
+
       <div className="mt-10 grid gap-12 lg:grid-cols-[minmax(0,1fr)_290px] lg:gap-16">
         <div className="min-w-0 space-y-14">
           <section aria-labelledby="about-heading">
             <SectionHead label="About" />
             <div className="max-w-3xl space-y-4">
-              {rom.description.split("\n\n").map((paragraph) => (
+              {kernel.description.split("\\n\\n").map((paragraph) => (
                 <p
                   key={paragraph.slice(0, 32)}
                   className="text-[15px] leading-relaxed text-muted"
@@ -222,7 +180,13 @@ export default async function RomPage({
                       <span className="badge-new">Latest</span>
                     </p>
                     <p className="mt-1.5 truncate text-[13px] text-muted">
-                      {releaseMeta(latest)}
+                      {[
+                        latest.android,
+                        latest.linux ? `Linux ${latest.linux}` : null,
+                        latest.kernelSu,
+                      ]
+                        .filter(Boolean)
+                        .join(" • ")}
                     </p>
                   </div>
                   <div className="sm:text-right">
@@ -234,7 +198,10 @@ export default async function RomPage({
                     </time>
                     <div className="mt-2.5">
                       <Link
-                        href={releaseHref(latest.romSlug, latest.versionDir)}
+                        href={kernelReleaseHref(
+                          latest.kernelSlug,
+                          latest.versionDir
+                        )}
                         className="btn-outline-accent"
                       >
                         View release <span aria-hidden="true">→</span>
@@ -245,29 +212,58 @@ export default async function RomPage({
                 {downloadUrl && (
                   <p className="border-t border-line px-5 py-3 text-[12.5px] leading-relaxed text-faint">
                     The newest build is hosted on {downloadHostLabel(downloadUrl)}.
-                    See the release page for downloads, requirements and
-                    warnings.
+                    See the release page for downloads and flashing notes.
                   </p>
                 )}
               </div>
             </section>
           )}
 
+          {kernel.features.length > 0 && (
+            <section aria-labelledby="features-heading">
+              <SectionHead label="Features" />
+              <ul
+                id="features-heading"
+                className="grid gap-x-8 gap-y-2 sm:grid-cols-2"
+              >
+                {kernel.features.map((feature) => (
+                  <li
+                    key={feature}
+                    className="flex gap-2.5 text-[14px] leading-relaxed text-muted"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="mt-[3px] shrink-0 font-mono text-accent"
+                    >
+                      –
+                    </span>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
           <section aria-labelledby="releases-heading">
             <SectionHead
-              label={`Releases (${rom.releaseCount})`}
-              href="/releases"
-              linkLabel="All releases"
+              label={`Release history (${kernel.releaseCount})`}
+              href="/kernels"
+              linkLabel="All kernels"
             />
             <ReleaseArchive
-              items={rom.releases.map((release, index) => ({
+              items={kernel.releases.map((release, index) => ({
                 // The loader sorts releases newest first, so index 0 is latest.
                 version: release.version,
-                href: releaseHref(release.romSlug, release.versionDir),
+                href: kernelReleaseHref(release.kernelSlug, release.versionDir),
                 dateISO: release.releaseDate,
-                meta: releaseMeta(release),
+                meta: [
+                  release.android,
+                  release.linux ? `Linux ${release.linux}` : null,
+                  release.kernelSu,
+                ]
+                  .filter(Boolean)
+                  .join(" • "),
                 isLatest: index === 0,
-                isNew: index !== 0 && isNewRelease(release.releaseDate),
               }))}
             />
           </section>
@@ -275,72 +271,64 @@ export default async function RomPage({
 
         {/* Sidebar */}
         <aside className="space-y-10 lg:border-l lg:border-line lg:pl-10">
-          <section aria-label="ROM information">
+          <section aria-label="Kernel information">
             <MetaList>
               <MetaRow label="Maintainer">
-                {rom.maintainerTelegram ? (
+                {kernel.maintainerTelegram ? (
                   <a
-                    href={rom.maintainerTelegram}
+                    href={kernel.maintainerTelegram}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="underline decoration-line underline-offset-2 transition-colors hover:text-accent hover:decoration-accent"
                   >
-                    {rom.maintainer}
+                    {kernel.maintainer}
                   </a>
                 ) : (
-                  rom.maintainer
+                  kernel.maintainer
                 )}
               </MetaRow>
-              <MetaRow label="Android base">{rom.androidBase}</MetaRow>
-              <MetaRow label="Support">
-                <span
-                  className={
-                    rom.support === "official"
-                      ? "font-medium text-fg"
-                      : "text-muted"
-                  }
-                >
-                  {rom.support === "official" ? "Official" : "Unofficial"}
-                </span>
-              </MetaRow>
+              <MetaRow label="Device">{site.device}</MetaRow>
               <MetaRow label="Codename">
-                <span className="font-mono text-[12px]">{rom.codename}</span>
+                <span className="font-mono text-[12px]">{site.codename}</span>
               </MetaRow>
-              <MetaRow label="Releases">{String(rom.releaseCount)}</MetaRow>
+              <MetaRow label="Android">
+                {latest?.android ?? kernel.android ?? "—"}
+              </MetaRow>
+              <MetaRow label="Linux">
+                {latest?.linux ?? kernel.linux ?? "—"}
+              </MetaRow>
+              <MetaRow label="Releases">{String(kernel.releaseCount)}</MetaRow>
             </MetaList>
           </section>
 
-          {(rom.officialSite || rom.github || rom.links.length > 0) && (
-            <section aria-labelledby="rom-links">
+          {kernel.source && (
+            <section aria-labelledby="kernel-links">
               <SectionHead label="Links" />
-              <ul id="rom-links" className="-mt-2">
-                {rom.officialSite && (
-                  <ExternalLinkRow
-                    label="Official site"
-                    url={rom.officialSite}
-                  />
-                )}
-                {rom.github && (
-                  <ExternalLinkRow
-                    label="Source / GitHub"
-                    url={rom.github}
-                  />
-                )}
-                {rom.links.map((link) => (
-                  <ExternalLinkRow key={link.url} label={link.label} url={link.url} />
-                ))}
+              <ul id="kernel-links" className="-mt-2">
+                <li>
+                  <a
+                    href={kernel.source}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center justify-between gap-3 border-b border-line-soft py-2.5 text-[13.5px] text-muted transition-colors last:border-b-0 hover:text-accent"
+                  >
+                    <span className="truncate">Source code</span>
+                    <span
+                      aria-hidden="true"
+                      className="shrink-0 text-faint group-hover:text-accent"
+                    >
+                      ↗
+                    </span>
+                  </a>
+                </li>
               </ul>
-              <p className="mt-3 text-[12px] leading-relaxed text-faint">
-                Links point to external sites — verify you trust the source
-                before downloading.
-              </p>
             </section>
           )}
 
           <WarningBox
             title="Before you flash"
             items={[
-              "Check firmware requirements and the warnings on every release page.",
+              "Check that the kernel supports your ROM and firmware before flashing.",
             ]}
             safetyLink
           />

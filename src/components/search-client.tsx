@@ -103,7 +103,7 @@ export function SearchClient() {
                   href={entry.url}
                   className="group -mx-2 flex items-start gap-4 border-b border-line px-2 py-3.5 transition-colors last:border-b-0 hover:bg-surface sm:-mx-3 sm:px-3"
                 >
-                  <span className="mt-0.5 w-[64px] shrink-0 border border-line bg-raised px-1.5 py-0.5 text-center font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+                  <span className="mt-0.5 min-w-[64px] shrink-0 border border-line bg-raised px-1.5 py-0.5 text-center font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
                     {entry.kind}
                   </span>
                   <span className="min-w-0 flex-1">

@@ -48,8 +48,11 @@ export function ReleaseRow({ item }: { item: ReleaseListItem }) {
   );
 }
 
-/** Compact row for a ROM (used on the homepage). */
-export function RomRow({
+/**
+ * Compact archive row for a top-level entry (ROM or kernel). Used on the
+ * homepage ROM cards and the kernels listing.
+ */
+export function ArchiveRow({
   name,
   href,
   description,

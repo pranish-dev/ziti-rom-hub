@@ -1,6 +1,17 @@
 import type { MetadataRoute } from "next";
-import { getAllGuides, getAllRoms, getAllReleases } from "@/lib/content";
-import { releaseHref, romHref } from "@/lib/format";
+import {
+  getAllGuides,
+  getAllKernelReleases,
+  getAllKernels,
+  getAllRoms,
+  getAllReleases,
+} from "@/lib/content";
+import {
+  kernelHref,
+  kernelReleaseHref,
+  releaseHref,
+  romHref,
+} from "@/lib/format";
 import { site } from "@/lib/site";
 
 // Required for `output: "export"` — emits a static sitemap.xml at build time.
@@ -36,6 +47,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
+  const kernels: MetadataRoute.Sitemap = getAllKernels().map((kernel) => ({
+    url: `${site.url}${kernelHref(kernel)}`,
+    lastModified: kernel.latest
+      ? new Date(`${kernel.latest.releaseDate}T00:00:00Z`)
+      : now,
+    changeFrequency: "weekly",
+    priority: 0.8,
+  }));
+
+  const kernelReleases: MetadataRoute.Sitemap = getAllKernelReleases().map(
+    (release) => ({
+      url: `${site.url}${kernelReleaseHref(release.kernelSlug, release.versionDir)}`,
+      lastModified: new Date(`${release.releaseDate}T00:00:00Z`),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    })
+  );
+
   const guides: MetadataRoute.Sitemap = getAllGuides().map((guide) => ({
     url: `${site.url}/guides/${guide.slug}`,
     lastModified: now,
@@ -43,5 +72,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.5,
   }));
 
-  return [...staticRoutes, ...roms, ...releases, ...guides];
+  return [...staticRoutes, ...roms, ...releases, ...kernels, ...kernelReleases, ...guides];
 }

@@ -1,11 +1,11 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { RomRow } from "@/components/release-row";
+import { ArchiveRow } from "@/components/release-row";
 import { ReleaseTimeline } from "@/components/release-timeline";
 import { LATEST_RELEASES_LIMIT, type TimelineItem } from "@/lib/timeline";
 import { SectionHead } from "@/components/section-head";
-import { getAllGuides, getAllRoms, getAllReleases, getHubStats } from "@/lib/content";
-import { formatReleaseDate, releaseHref } from "@/lib/format";
+import { getAllGuides, getAllRoms, getAllReleases, getAllKernelReleases, getHubStats } from "@/lib/content";
+import { formatReleaseDate, kernelReleaseHref, releaseHref } from "@/lib/format";
 import { site } from "@/lib/site";
 import { buildOpenGraph, buildTwitter } from "@/lib/seo";
 
@@ -31,12 +31,12 @@ export default function HomePage() {
   const guides = getAllGuides();
   const stats = getHubStats();
 
-  // Global timeline: every ROM's releases, already sorted newest first by the
-  // loader, trimmed to the preview limit.
-  const timelineItems: TimelineItem[] = getAllReleases()
-    .slice(0, LATEST_RELEASES_LIMIT)
-    .map((release, index) => ({
-      romName: release.rom.name,
+  // Global timeline: every ROM release AND kernel release, combined and
+  // sorted newest first (ISO dates sort chronologically), trimmed to the
+  // preview limit.
+  const timelineItems: TimelineItem[] = [
+    ...getAllReleases().map((release) => ({
+      name: release.rom.name,
       version: release.version,
       href: releaseHref(release.romSlug, release.versionDir),
       dateISO: release.releaseDate,
@@ -49,8 +49,27 @@ export default function HomePage() {
       ]
         .filter(Boolean)
         .join(" • "),
-      isLatest: index === 0,
-    }));
+      isLatest: false,
+    })),
+    ...getAllKernelReleases().map((release) => ({
+      name: release.kernel.name,
+      version: release.version,
+      href: kernelReleaseHref(release.kernelSlug, release.versionDir),
+      dateISO: release.releaseDate,
+      dateLabel: formatReleaseDate(release.releaseDate),
+      meta: [
+        release.android,
+        release.linux ? `Linux ${release.linux}` : null,
+        release.kernelSu,
+      ]
+        .filter(Boolean)
+        .join(" • "),
+      isLatest: false,
+    })),
+  ]
+    .sort((a, b) => b.dateISO.localeCompare(a.dateISO))
+    .slice(0, LATEST_RELEASES_LIMIT)
+    .map((item, index) => ({ ...item, isLatest: index === 0 }));
 
   return (
     <>
@@ -71,11 +90,12 @@ export default function HomePage() {
           {/* Archive statistics — each links into the archive */}
           <nav
             aria-label="Archive statistics"
-            className="mt-8 grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-4"
+            className="mt-8 grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5"
           >
             {[
               { label: "ROMs", value: stats.romCount, href: "/ziti/roms" },
               { label: "Releases", value: stats.releaseCount, href: "/releases" },
+              { label: "Kernels", value: stats.kernelCount, href: "/kernels" },
               {
                 label: "Official ROMs",
                 value: roms.filter((rom) => rom.support === "official").length,
@@ -154,7 +174,7 @@ export default function HomePage() {
             />
             <div>
               {roms.map((rom) => (
-                <RomRow
+                <ArchiveRow
                   key={rom.slug}
                   name={rom.name}
                   href={`/ziti/roms/${rom.slug}`}
