@@ -90,7 +90,7 @@ export default function HomePage() {
           {/* Archive statistics — each links into the archive */}
           <nav
             aria-label="Archive statistics"
-            className="mt-8 grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-5"
+            className="mt-8 grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-6"
           >
             {[
               { label: "ROMs", value: stats.romCount, href: "/ziti/roms" },
@@ -106,20 +106,35 @@ export default function HomePage() {
                 value: roms.filter((rom) => rom.support === "unofficial").length,
                 href: "/ziti/roms?status=unofficial",
               },
-            ].map((stat) => (
-              <Link
-                key={stat.label}
-                href={stat.href}
-                className="group block bg-background px-4 py-3.5 transition-colors hover:bg-surface"
-              >
-                <span className="block font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
-                  {stat.label}
-                </span>
-                <span className="mt-1 block font-mono text-xl font-semibold text-fg transition-colors group-hover:text-accent">
-                  {stat.value}
-                </span>
-              </Link>
-            ))}
+              { label: "Codename", value: site.codename },
+            ].map((stat) =>
+              stat.href ? (
+                <Link
+                  key={stat.label}
+                  href={stat.href}
+                  className="group block bg-background px-4 py-3.5 transition-colors hover:bg-surface"
+                >
+                  <span className="block font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
+                    {stat.label}
+                  </span>
+                  <span className="mt-1 block font-mono text-xl font-semibold text-fg transition-colors group-hover:text-accent">
+                    {stat.value}
+                  </span>
+                </Link>
+              ) : (
+                <div
+                  key={stat.label}
+                  className="bg-background px-4 py-3.5"
+                >
+                  <span className="block font-mono text-[10px] uppercase tracking-[0.2em] text-faint">
+                    {stat.label}
+                  </span>
+                  <span className="mt-1 block font-mono text-xl font-semibold text-fg">
+                    {stat.value}
+                  </span>
+                </div>
+              )
+            )}
           </nav>
         </div>
       </section>
