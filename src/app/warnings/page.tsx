@@ -85,15 +85,13 @@ export default function WarningsPage() {
 
       {/* 1301 users */}
       <section aria-labelledby="warn-1301" className="mt-12">
-        <SectionHead label="For OOS 15.0.0.1301 users" />
+        <SectionHead label="For OOS 15.0.0.1301+ users" />
         <ol className="space-y-5">
           {[
             <>
-              Update 1301 with a future OOS OTA update <strong>with a locked
-              bootloader</strong>, or flash 1301 on the other slot too (same as
-              the reverting method) — and only then flash custom ROMs shipped
-              without firmware. This way the other slot containing old firmware
-              (previous OTA update 1201) gets overwritten with the 1301 one.
+              Only update to 1301+ with <strong>with a locked
+              bootloader</strong>, flash 1301(same oos version that you are currently on) to the other slot too (reinstall same oos using local install option) — and only then flash custom ROMs shipped
+              without firmware. This way both slots will contain the same firmware.
             </>,
             <>
               <strong>DO NOT</strong> flash custom ROMs or downgrade to previous
