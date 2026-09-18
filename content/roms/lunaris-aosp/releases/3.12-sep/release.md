@@ -47,7 +47,7 @@ credits:
 3. Flash the ROM zip, then flash GApps **only if you downloaded the Vanilla build.
 4. Reboot, and let the first boot settle for a few minutes.
 
-> Root users: KernelSU Next is not availabe by default flash ampere kernel for ksu.
+> Root users: KernelSU Next is not availabe by default flash [ampere kernel](/kernels/ampere/1.1) for ksu.
 
 ## Known issues
 
