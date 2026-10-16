@@ -1,0 +1,38 @@
+---
+version: "v2.0"
+release_date: "2026-10-08"
+android: "Android 16 & 17"
+linux: "5.4.302"
+kernel_su: "Supported"
+susfs: "SUSFS v2.3.0"
+supported_roms:
+  - "VoltageOS v6.x"
+  - "LunarisAOSP 3.12 sep patch"
+downloads:
+  primary: "https://github.com/ziti-resources/kernel_oneplus_sm8350/releases/tag/ampere-v2.0"
+source: "https://github.com/ziti-resources/kernel_oneplus_sm8350"
+ksu: true
+---
+## Changelog
+- Switched to ReSukiSU from KernelSU-Next
+- Added NoMount support
+
+## Installation notes
+
+1. Boot into bootloader.
+   ```bash
+   adb reboot bootloader
+   ```
+2. flash vendor_boot (recovery)
+   ```bash
+   fastboot flash vendor_boot vendor_boot.img
+   ```
+3. Reboot to recovery
+   ```bash
+   fastboot reboot recovery
+   ```
+4. Sideload Ampere Kernel
+   ```bash
+   adb sideload <Amperekernel.zip>
+   ```
+5. Reboot
