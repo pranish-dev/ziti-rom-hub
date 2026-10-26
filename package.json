@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "description": "Custom ROM hub for the OnePlus Nord CE 3 5G (ziti). Git-backed content, no database.",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "node scripts/copy-media.mjs && next dev",
     "build": "npm run validate-content && npm run generate-search-index && node scripts/copy-media.mjs && next build",
