@@ -1,5 +1,5 @@
 ---
-version: "6.1 Official"
+version: "6.2 Official"
 release_date: "2026-10-15"
 android: "Android 17"
 qpr: "Initial"
