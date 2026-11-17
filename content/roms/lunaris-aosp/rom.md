@@ -4,7 +4,7 @@ slug: lunaris-aosp
 maintainer: okkotsu
 maintainer_telegram: "https://t.me/okkotsu66"
 android_base: Android 16
-support: "official"
+support: "unofficial"
 official_site: https://github.com/Lunaris-AOSP
 github: https://github.com/Lunaris-AOSP
 links:
